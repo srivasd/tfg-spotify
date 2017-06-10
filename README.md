@@ -1,4 +1,4 @@
-# TFG-Spotify ![SPOTIFY LOGO](Pictures/Spotify-android.png)
+# TFG-Spotify ![SPOTIFY LOGO](Pictures/Spotify.png)
 
 A repository dedicated to make a Spotify song recommendation system, using Python
 
