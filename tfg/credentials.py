@@ -1,19 +1,14 @@
 
 # export SPOTIPY_CLIENT_ID='1e0cf3d0cdd8419083524b6f045849d5'
 # export SPOTIPY_CLIENT_SECRET='01ac539b293a4860bb0cc4ee8d07d5f3'
-# export SPOTIPY_REDIRECT_URI='http://localhost:8080/tfg-spotify'
+# export SPOTIPY_REDIRECT_URI='http://localhost:8888/callback'
 
-import sys
 import spotipy
 import spotipy.util as util
 
 scope = 'user-library-read'
 
-if len(sys.argv) > 1:
-    username = sys.argv[1]
-else:
-    print("Usage: %s username" % (sys.argv[0],))
-    sys.exit()
+username = 'srivasdelgado'
 
 token = util.prompt_for_user_token(username, scope)
 print(token)
