@@ -1,5 +1,6 @@
 import spotipy
 import spotipy.util as util
+import json
 
 scope = 'user-library-read'
 
@@ -10,10 +11,9 @@ print(token)
 
 
 if token:
+    artist_id = '3heR1it0slFXjaa7E62zpw'
     sp = spotipy.Spotify(auth=token)
-    results = sp.current_user_saved_tracks()
-    for item in results['items']:
-        track = item['track']
-        print(track['name'] + ' - ' + track['artists'][0]['name'])
+    artist_info = sp.artist(artist_id)
+    print(json.dumps(artist_info, indent=1))
 else:
     print("Can't get token for", username)
