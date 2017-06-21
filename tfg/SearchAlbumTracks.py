@@ -12,17 +12,17 @@ print(token)
 
 
 if token:
-    # Imagine Dragons
-    artist_id = '53XhwfbYqKCa1cC15pYq2q'
+    # Night Visions
+    album_id = '1vAEF8F0HoRFGiYOEeJXHW'
     sp = spotipy.Spotify(auth=token)
     count = sys.maxsize
     offset = 0
-    limit = 1
+    limit = 50
     while True:
-        artist_info = sp.artist_albums(artist_id, album_type='album', offset=offset, limit=limit)
-        offset += len(artist_info['items'])
-        print(json.dumps(artist_info, indent=1))
-        if len(artist_info['items']) < limit:
+        album_info = sp.album_tracks(album_id, offset=offset, limit=limit)
+        offset += len(album_info['items'])
+        print(json.dumps(album_info, indent=1))
+        if len(album_info['items']) < limit:
             break
 else:
     print("Can't get token for", username)

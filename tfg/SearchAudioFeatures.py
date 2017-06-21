@@ -11,10 +11,10 @@ print(token)
 
 
 if token:
-    # Imagine Dragons
-    artist_id = '53XhwfbYqKCa1cC15pYq2q'
+    # On top of the world
+    track_id = '4eLSCSELtKxZwXnFbNLXT5'
     sp = spotipy.Spotify(auth=token)
-    artist_info = sp.artist_albums(artist_id)
-    print(json.dumps(artist_info, indent=1))
+    track_info = sp.audio_features(track_id)
+    print(json.dumps(track_info, indent=1))
 else:
     print("Can't get token for", username)

@@ -11,10 +11,10 @@ print(token)
 
 
 if token:
-    # Imagine Dragons
-    artist_id = '53XhwfbYqKCa1cC15pYq2q'
+    # Maldita Nerea
+    artist_id = '3heR1it0slFXjaa7E62zpw'
     sp = spotipy.Spotify(auth=token)
-    artist_info = sp.artist_albums(artist_id)
+    artist_info = sp.artist_related_artists(artist_id)
     print(json.dumps(artist_info, indent=1))
 else:
     print("Can't get token for", username)

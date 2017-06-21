@@ -11,6 +11,7 @@ print(token)
 
 
 if token:
+    # Maldita Nerea
     artist_id = '3heR1it0slFXjaa7E62zpw'
     sp = spotipy.Spotify(auth=token)
     artist_info = sp.artist(artist_id)
