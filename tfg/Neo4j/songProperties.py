@@ -33,7 +33,8 @@ if token:
                 track_info = sp.audio_features(song['id'])
                 for feature in track_info:
                     session.run(
-                        "CREATE (a:Song {name: {name}, danceability: {danceability}, energy: {energy}, liveness: {liveness}",
+                        "CREATE (a:Song {name: {name}, danceability: {danceability}, energy: {energy}, liveness: {"
+                        "liveness}})",
                         {"name": song['name'], "danceability": feature['danceability'], "energy": feature['energy'], "liveness": feature['liveness']})
                 cont += 1
             if len(album_info['items']) < limit:
@@ -42,7 +43,7 @@ else:
     print("Can't get token for", username)
 
 result = session.run("MATCH (a:Song)"
-                     "RETURN a.name AS name, a.danceability AS danceability, a.energy AS energy, liveness AS liveness")
+                     "RETURN a.name AS name, a.danceability AS danceability, a.energy AS energy, a.liveness AS liveness")
 
 for record in result:
     print("%s %s %s %s" % (record["name"], record["danceability"], record["energy"], record["liveness"]))
