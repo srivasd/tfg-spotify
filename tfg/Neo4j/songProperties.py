@@ -28,15 +28,20 @@ if token:
         cont = 1
         while True:
             album_info = sp.album_tracks(album_id, offset=offset, limit=limit)
+            album_name = sp.album(album_id)
             offset += len(album_info['items'])
+            # print(json.dumps(album_name, indent=1))
+            session.run("CREATE (a:Album {name: {name}})",
+                        {"name": album_name['name']})
             for song in album_info['items']:
                 track_info = sp.audio_features(song['id'])
                 for feature in track_info:
                     session.run(
-                        "CREATE (a:Song {name: {name}, danceability: {danceability}, energy: {energy}, liveness: {"
+                        "CREATE (s:Song {name: {name}, danceability: {danceability}, energy: {energy}, liveness: {"
                         "liveness}})",
                         {"name": song['name'], "danceability": feature['danceability'], "energy": feature['energy'], "liveness": feature['liveness']})
                 cont += 1
+            session.run("MATCH (s:Song),(a:Album) CREATE (s)-[r: ALBUM]->(a) RETURN r")
             if len(album_info['items']) < limit:
                 break
 else:
