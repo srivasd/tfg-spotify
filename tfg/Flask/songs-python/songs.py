@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-import json
+from json import dumps
 from sys import maxsize
 
-from flask import Flask, g
-from neo4j.v1 import GraphDatabase, basic_auth, Response
+from flask import Flask, g, Response
+from neo4j.v1 import GraphDatabase, basic_auth
 from spotipy import Spotify
 from spotipy.util import prompt_for_user_token
 
@@ -82,34 +82,34 @@ def get_graph():
     nodes = []
     rels = []
     i = 0
-    target = i
     print('--------------------GRAPH INFORMATION--------------------')
     albums = db.run("MATCH (a:Album) RETURN a")
     for album in albums:
         album_properties = album['a'].properties
         nodes.append({"title": album_properties["name"], "label": "album"})
+        target = i
+        i += 1
         print("Album: ", album_properties['name'])
-    results = db.run("MATCH (s:Song) RETURN s")
-    for song in results:
-        song_properties = song['s'].properties
-        print("Song: ", song_properties['name'], " - ", "Track: ", song_properties['track'])
-        song_node = {"title": song_properties["name"], "label": "song"}
-        try:
-            source = nodes.index(song_node)
-        except ValueError:
-            nodes.append(song_node)
-            source = i
-            i += 1
-        rels.append({"source": source, "target": target})
+        results = db.run("MATCH (s:Song) RETURN s")
+        for song in results:
+            song_properties = song['s'].properties
+            print("Song: ", song_properties['name'], " - ", "Track: ", song_properties['track'])
+            song_node = {"title": song_properties["name"], "label": "song"}
+            try:
+                source = nodes.index(song_node)
+            except ValueError:
+                nodes.append(song_node)
+                source = i
+                i += 1
+            rels.append({"source": source, "target": target})
     for n in nodes:
         print(n)
     for r in rels:
         print(r)
-    print(Response(json.dumps({"nodes": nodes, "links": rels}),
+    print(Response(dumps({"nodes": nodes, "links": rels}),
                    mimetype="application/json"))
-    return Response(json.dumps({"nodes": nodes, "links": rels}),
+    return Response(dumps({"nodes": nodes, "links": rels}),
                     mimetype="application/json")
-
 
 if __name__ == '__main__':
     app.run(port=8080)

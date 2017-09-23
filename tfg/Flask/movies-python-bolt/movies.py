@@ -69,6 +69,10 @@ def get_graph():
                 source = i
                 i += 1
             rels.append({"source": source, "target": target})
+    for n in nodes:
+        print(n)
+    for r in rels:
+        print(r)
     print(Response(dumps({"nodes": nodes, "links": rels}),
                    mimetype="application/json"))
     return Response(dumps({"nodes": nodes, "links": rels}),
