@@ -2,6 +2,7 @@ import spotipy
 import spotipy.util as util
 import json
 import sys
+from neo4j.v1 import GraphDatabase, basic_auth
 
 scope = 'user-library-read'
 
@@ -10,18 +11,23 @@ username = 'srivasdelgado'
 token = util.prompt_for_user_token(username, scope)
 print(token)
 
+driver = GraphDatabase.driver("bolt://localhost:7687", auth=basic_auth("neo4j", "neo4j"))
+session = driver.session()
 
 if token:
     # Song (On top of the world)
     main_features = []
     actual_features = []
     songs_checked = []
+    related_artists_checked = []
     song_id = '4eLSCSELtKxZwXnFbNLXT5'
     sp = spotipy.Spotify(auth=token)
     offset = 0
     limit = 2
     song_info = sp.track(song_id)
     # print(json.dumps(song_info, indent=1))
+    session.run("CREATE (s:Song {name: {name}})",
+                {"name": song_info['name']})
     song_features = sp.audio_features(song_info['id'])
     # print(json.dumps(track_info, indent=1))
     print(song_info['name'])
@@ -47,13 +53,16 @@ if token:
     artistId = song_info['album']['artists'][0]['id']
     print(artistId)
 
+    session.run("CREATE (ar:Artist {name: {name}})",
+                {"name": song_info['album']['artists'][0]['name']})
+
+    session.run("MATCH (s:Song),(ar:Artist) CREATE (s)-[r: ARTIST]->(ar) RETURN r")
     # Related Artist's
     sp = spotipy.Spotify(auth=token)
     related_artists = sp.artist_related_artists(artistId)
     # print(json.dumps(related_artists, indent=1))
     for related_artist in related_artists['artists']:
         print(related_artist['id'])
-
         # Artist's related songs to the first one
         # Artist's albums
 
@@ -100,19 +109,29 @@ if token:
                                         change_feature = abs(actual_features[i] - main_features[i]) + change_feature
                                     i = i + 1
                                 actual_features.clear()
-                                if change_feature < 0.5:
-                                    if song not in songs_checked:
-                                        print('Song', cont, ':', song['name'])
+                                if change_feature < 0.5 and song not in songs_checked:
+                                    print('Song', cont, ':', song['name'])
 
-                                        print('\tDanceability:', feature['danceability'])
-                                        print('\tEnergy:', feature['energy'])
-                                        print('\tLiveness:', feature['liveness'])
-                                        print('\tMode:', feature['mode'])
-                                        print('\tSpeechiness:', feature['speechiness'])
-                                        print('\tAcousticness:', feature['acousticness'])
-                                        print('\tInstrumentalness:', feature['instrumentalness'])
-                                        print('\tValence:', feature['valence'])
-                                        songs_checked.append(song)
+                                    print('\tDanceability:', feature['danceability'])
+                                    print('\tEnergy:', feature['energy'])
+                                    print('\tLiveness:', feature['liveness'])
+                                    print('\tMode:', feature['mode'])
+                                    print('\tSpeechiness:', feature['speechiness'])
+                                    print('\tAcousticness:', feature['acousticness'])
+                                    print('\tInstrumentalness:', feature['instrumentalness'])
+                                    print('\tValence:', feature['valence'])
+                                    songs_checked.append(song)
+
+                                    if related_artist not in related_artists_checked:
+                                        cypher_artist = "CREATE (ra:RelatedArtist {name: {name}})"
+                                        session.run(cypher_artist,
+                                                    {"name": related_artist['name']})
+
+                                    session.run("CREATE (rs:RelatedSong {name: {name}})",
+                                                {"name": song['name']})
+                                    # session.run("MATCH (rar:RelatedArtist),(rs:RelatedSong) CREATE (rar)-[r: "
+                                    #             "RELATED_SONG]->(rs) RETURN r")
+                                    related_artists_checked.append(related_artist)
                             cont += 1
                         # print(json.dumps(album_info, indent=1))
                         if len(album_songs['items']) < limit:
@@ -121,9 +140,14 @@ if token:
             if len(artist_albums['items']) < limit:
                 break
 
+    session.run("MATCH (ar:Artist),(rar:RelatedArtist) CREATE (ar)-[r: RELATED_ARTIST]->("
+                "rar) RETURN r")
+
 
 # Repeat the process
 
 
 else:
     print("Can't get token for", username)
+
+session.close()
