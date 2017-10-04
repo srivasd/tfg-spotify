@@ -20,6 +20,8 @@ if token:
     actual_features = []
     songs_checked = []
     related_artists_checked = []
+    related_artist_global = ""
+    related_song_global = ""
     song_id = '4eLSCSELtKxZwXnFbNLXT5'
     sp = spotipy.Spotify(auth=token)
     offset = 0
@@ -123,14 +125,15 @@ if token:
                                     songs_checked.append(song)
 
                                     if related_artist not in related_artists_checked:
+                                        related_artist_global = related_artist['name']
                                         cypher_artist = "CREATE (ra:RelatedArtist {name: {name}})"
                                         session.run(cypher_artist,
                                                     {"name": related_artist['name']})
 
                                     session.run("CREATE (rs:RelatedSong {name: {name}})",
                                                 {"name": song['name']})
-                                    # session.run("MATCH (rar:RelatedArtist),(rs:RelatedSong) CREATE (rar)-[r: "
-                                    #             "RELATED_SONG]->(rs) RETURN r")
+                                    related_song_global = song['name']
+                                    session.run("MATCH (rar:RelatedArtist),(rs:RelatedSong) WHERE rar.name = \""+related_artist_global+"\" AND rs.name = \""+related_song_global+"\" CREATE (rar)-[r:RELATED_SONG]->(rs) RETURN r")
                                     related_artists_checked.append(related_artist)
                             cont += 1
                         # print(json.dumps(album_info, indent=1))
