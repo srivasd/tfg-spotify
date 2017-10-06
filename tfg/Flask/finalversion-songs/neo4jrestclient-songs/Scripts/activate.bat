@@ -1,5 +1,5 @@
 @echo off
-set "VIRTUAL_ENV=C:\Users\Sergio\PycharmProjects\tfg-spotify\tfg\Flask\songs-python\neo4jrestclient-songs"
+set "VIRTUAL_ENV=C:\Users\Sergio\PycharmProjects\tfg-spotify\tfg\Flask\finalversion-songs\neo4jrestclient-songs"
 
 if defined _OLD_VIRTUAL_PROMPT (
     set "PROMPT=%_OLD_VIRTUAL_PROMPT%"

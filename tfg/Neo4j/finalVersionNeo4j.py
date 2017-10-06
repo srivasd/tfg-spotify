@@ -130,10 +130,11 @@ if token:
                                         session.run(cypher_artist,
                                                     {"name": related_artist['name']})
 
-                                    session.run("CREATE (rs:RelatedSong {name: {name}})",
-                                                {"name": song['name']})
+                                    session.run("CREATE (rs:RelatedSong {name: {name}, artist: {artist}})",
+                                                {"name": song['name'], "artist": song['artists'][0]['name']})
                                     related_song_global = song['name']
-                                    session.run("MATCH (rar:RelatedArtist),(rs:RelatedSong) WHERE rar.name = \""+related_artist_global+"\" AND rs.name = \""+related_song_global+"\" CREATE (rar)-[r:RELATED_SONG]->(rs) RETURN r")
+                                    session.run(
+                                        "MATCH (rar:RelatedArtist),(rs:RelatedSong) WHERE rar.name = \"" + related_artist_global + "\" AND rs.name = \"" + related_song_global + "\" CREATE (rar)-[r:RELATED_SONG]->(rs) RETURN r")
                                     related_artists_checked.append(related_artist)
                             cont += 1
                         # print(json.dumps(album_info, indent=1))

@@ -40,7 +40,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="$(if [ "$OSTYPE" "==" "cygwin" ]; then cygpath -u 'C:\Users\Sergio\PycharmProjects\tfg-spotify\tfg\Flask\songs-python\neo4jrestclient-songs'; else echo '/C/Users/Sergio/PycharmProjects/tfg-spotify/tfg/Flask/songs-python/neo4jrestclient-songs'; fi;)"
+VIRTUAL_ENV="$(if [ "$OSTYPE" "==" "cygwin" ]; then cygpath -u 'C:\Users\Sergio\PycharmProjects\tfg-spotify\tfg\Flask\finalversion-songs\neo4jrestclient-songs'; else echo '/C/Users/Sergio/PycharmProjects/tfg-spotify/tfg/Flask/finalversion-songs/neo4jrestclient-songs'; fi;)"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
