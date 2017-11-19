@@ -22,6 +22,7 @@ if token:
     related_artists_checked = []
     related_artist_global = ""
     related_song_global = ""
+    main_artist = ""
     song_id = '4eLSCSELtKxZwXnFbNLXT5'
     sp = spotipy.Spotify(auth=token)
     offset = 0
@@ -51,7 +52,7 @@ if token:
         print('\tValence:', feature['valence'])
         main_features.append(feature['valence'])
     # Song's artist
-    # artistName = song_info['album']['artists'][0]['name']
+    main_artist = song_info['album']['artists'][0]['name']
     artistId = song_info['album']['artists'][0]['id']
     print(artistId)
 
@@ -126,15 +127,15 @@ if token:
 
                                     if related_artist not in related_artists_checked:
                                         related_artist_global = related_artist['name']
-                                        cypher_artist = "CREATE (ra:RelatedArtist {name: {name}})"
+                                        cypher_artist = "CREATE (ar:Artist {name: {name}})"
                                         session.run(cypher_artist,
                                                     {"name": related_artist['name']})
 
-                                    session.run("CREATE (rs:RelatedSong {name: {name}, artist: {artist}})",
+                                    session.run("CREATE (s:Song {name: {name}, artist: {artist}})",
                                                 {"name": song['name'], "artist": song['artists'][0]['name']})
                                     related_song_global = song['name']
                                     session.run(
-                                        "MATCH (rar:RelatedArtist),(rs:RelatedSong) WHERE rar.name = \"" + related_artist_global + "\" AND rs.name = \"" + related_song_global + "\" CREATE (rar)-[r:RELATED_SONG]->(rs) RETURN r")
+                                        "MATCH (ar:Artist),(s:Song) WHERE ar.name = \"" + related_artist_global + "\" AND s.name = \"" + related_song_global + "\" CREATE (ar)-[r:RELATED_SONG]->(s) RETURN r")
                                     related_artists_checked.append(related_artist)
                             cont += 1
                         # print(json.dumps(album_info, indent=1))
@@ -144,8 +145,9 @@ if token:
             if len(artist_albums['items']) < limit:
                 break
 
-    session.run("MATCH (ar:Artist),(rar:RelatedArtist) CREATE (ar)-[r: RELATED_ARTIST]->("
-                "rar) RETURN r")
+    session.run(
+        "MATCH (ar:Artist),(ar2:Artist) WHERE ar.name = \"" + main_artist + "\" AND NOT ar2.name = \"" + main_artist + "\"CREATE (ar)-[r: RELATED_ARTIST]->("
+                                                                            "ar2) RETURN r")
 
 
 # Repeat the process
