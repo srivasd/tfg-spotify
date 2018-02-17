@@ -71,9 +71,9 @@
     </div>
 </div>
 <style type="text/css">
-    .node { stroke: #222; stroke-width: 1.5px; }
-    .node.actor { fill: #888; }
-    .node.movie { fill: #BBB; }
+    .node { stroke: #222; stroke-width: 2px; }
+    .node.song { fill: #1dff2b; }
+    .node.artist { fill: #606060; }
     .link { stroke: #999; stroke-opacity: .6; stroke-width: 1px; }
 </style>
 
@@ -82,7 +82,7 @@
 <script type="text/javascript">
     $(function () {
         function showMovie(title) {
-            $.get("/movie/" + encodeURIComponent(title),
+            /*$.get("/movie/" + encodeURIComponent(title),
                     function (data) {
                         if (!data) return;
                         $("#title").text(data.title);
@@ -92,10 +92,10 @@
                             $list.append($("<li>" + cast.name + " " +cast.job + (cast.job == "acted"?" as " + cast.role : "") + "</li>"));
                         });
                     }, "json");
-            return false;
+            return false;*/
         }
         function search() {
-            var query=$("#search").find("input[name=search]").val();
+            /*var query=$("#search").find("input[name=search]").val();
             $.get("/search?q=" + encodeURIComponent(query),
                     function (data) {
                         var t = $("table#results tbody").empty();
@@ -106,7 +106,7 @@
                         });
                         showMovie(data[0].title);
                     }, "json");
-            return false;
+            return false;*/
         }
 
         $("#search").submit(search);
@@ -124,6 +124,15 @@
             .attr("width", "100%").attr("height", "100%")
             .attr("pointer-events", "all");
 
+    function clicked() {
+            console.log(d3.select(this)[0][0].__data__.title);
+            d3.select(this).transition()
+                    .style("fill", "red")
+
+            window.location.href = "/?song=" + d3.select(this)[0][0].__data__.title;
+        }
+
+
     d3.json("/graph", function(error, graph) {
 		if (error) return;
 
@@ -136,9 +145,11 @@
         var node = svg.selectAll(".node")
                 .data(graph.nodes).enter()
                 .append("circle")
-                .attr("class", function (d) { return "node "+d.label })
+                .attr("class", function (d) {
+                    return "node "+d.label })
                 .attr("r", 10)
-                .call(force.drag);
+                .call(force.drag)
+                .on("click", clicked);
 
         // html title attribute
         node.append("title")
