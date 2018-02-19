@@ -14,11 +14,11 @@
             <div class="col-sm-6 col-md-6">
                 <ul class="nav navbar-nav">
                     <li>
-                        <form role="search" class="navbar-form" id="search">
+                        <form role="song" class="navbar-form" id="song">
                             <div class="form-group">
-                                <input type="text" placeholder="Search for Song Title" class="form-control" name="search">
+                                <input type="text" placeholder="Search for Song Title" class="form-control" name="song">
                             </div>
-                            <button class="btn btn-default" type="submit">Search</button>
+                            <button class="btn btn-default">Search</button>
                         </form>
                     </li>
                 </ul>
@@ -80,11 +80,11 @@
 <script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 <script src="http://d3js.org/d3.v3.min.js" type="text/javascript"></script>
 <script type="text/javascript">
-    /*function searchSong() {
+    function searchSong() {
         var inputValue = document.querySelector('[name="search"]').value;
         console.log(inputValue);
         window.location.href = "/?song=" + inputValue;
-    }*/
+    }
 </script>
 
 <script type="text/javascript">
