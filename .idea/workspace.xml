@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="98644996-83d7-4e45-9e85-44de624a0170" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tfg/Flask/songs-python-bolt" afterPath="$PROJECT_DIR$/tfg/Flask/songs-python-bolt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tfg/Flask/finalversion-songs/.cache-srivasdelgado" afterPath="$PROJECT_DIR$/tfg/Flask/finalversion-songs/.cache-srivasdelgado" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tfg/Flask/finalversion-songs/finalversion-songs.py" afterPath="$PROJECT_DIR$/tfg/Flask/finalversion-songs/finalversion-songs.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -66,8 +67,8 @@
       <file leaf-file-name="finalversion-songs.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/tfg/Flask/finalversion-songs/finalversion-songs.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="96">
-              <caret line="96" column="122" lean-forward="false" selection-start-line="96" selection-start-column="31" selection-end-line="96" selection-end-column="122" />
+            <state relative-caret-position="249">
+              <caret line="197" column="67" lean-forward="false" selection-start-line="197" selection-start-column="67" selection-end-line="197" selection-end-column="67" />
               <folding />
             </state>
           </provider>
@@ -913,7 +914,7 @@
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.507365" sideWeight="0.6611195" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.28641573" sideWeight="0.71331316" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3371522" sideWeight="0.8290469" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.44844517" sideWeight="0.8290469" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24886535" sideWeight="0.18215613" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39805827" sideWeight="0.49475262" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -1333,8 +1334,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/tfg/Flask/finalversion-songs/finalversion-songs.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="96">
-          <caret line="96" column="122" lean-forward="false" selection-start-line="96" selection-start-column="31" selection-end-line="96" selection-end-column="122" />
+        <state relative-caret-position="249">
+          <caret line="197" column="67" lean-forward="false" selection-start-line="197" selection-start-column="67" selection-end-line="197" selection-end-column="67" />
           <folding />
         </state>
       </provider>
