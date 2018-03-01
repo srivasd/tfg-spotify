@@ -4,7 +4,7 @@ from sys import maxsize
 
 import spotipy
 import sys
-from flask import Flask, g, Response, request
+from flask import Flask, g, Response, request, json
 from neo4j.v1 import GraphDatabase, basic_auth
 from spotipy import Spotify
 from spotipy.util import prompt_for_user_token
@@ -54,8 +54,15 @@ def get_index():
             song_id = result['tracks']['items'][0]['id']
 
             song_info = sp.track(song_id)
+            query = 'MATCH (s:Song) WHERE s.name = "'+song_proof+'" RETURN s'
+            results = db.run(query)
+            duplicated = ""
+            for record in results:
+                print(record["s"].properties['name'])
+                duplicated = record["s"].properties['name']
 
-            db.run("CREATE (s:Song {name: {name}, main: {main}})",
+            if duplicated != song_proof:
+                db.run("CREATE (s:Song {name: {name}, main: {main}})",
                    {"name": song_info['name'], "main": True})
 
             song_features = sp.audio_features(song_info['id'])
@@ -173,8 +180,7 @@ def get_index():
                         break
 
             db.run(
-                'MATCH (ar:Artist),(ar2:Artist) WHERE ar.name = "' + main_artist + "\" AND NOT ar2.name = \"" + main_artist + "\"CREATE (ar)-[r: RELATED_ARTIST]->("
-                                                                                                                               "ar2) RETURN r")
+                'MATCH (ar:Artist),(ar2:Artist) WHERE ar.name = "' + main_artist + "\" AND NOT ar2.name = \"" + main_artist + "\"CREATE (ar)-[r: RELATED_ARTIST]->(ar2) RETURN r")
 
         # Repeat the process
 
@@ -186,44 +192,44 @@ def get_index():
 
 @app.route("/graph")
 def get_graph():
-    db = get_db()
+    # db = get_db()
     nodes = []
     rels = []
-    print('--------------------GRAPH INFORMATION--------------------')
-    songs_main = db.run("MATCH (s:Song) WHERE s.main = True RETURN s")
-    for song in songs_main:
-        song_properties = song['s'].properties
-        print(song_properties)
-        nodes.append({"title": song_properties["name"], "label": "song"})
-    # Target de la cancion escogida
-    target = 0
-    artists_main = db.run("MATCH (a:Artist) WHERE a.main = True RETURN a")
-    for artist in artists_main:
-        artist_properties = artist['a'].properties
-        print(artist_properties)
-        nodes.append({"title": artist_properties["name"], "label": "artist"})
-    # Source de grupo de la canción escogida
-    source = 1
-    rels.append({"source": source, "target": target})
-    # Target2 grupo de la cancion escogida y Source2 grupos relacionados
-    target2 = 1
-    source2 = 2
-    related_artists = db.run("MATCH (a:Artist) WHERE a.main = False RETURN a")
-    for related_artist in related_artists:
-        related_artist_properties = related_artist['a'].properties
-        nodes.append({"title": related_artist_properties["name"], "label": "artist"})
-        rels.append({"source": source2, "target": target2})
-        target3 = source2
-        source3 = source2 + 1
-        related_songs = db.run("MATCH (s:Song) WHERE s.artist = \""+related_artist_properties["name"]+"\" AND s.main "
-                                                                                                      "= False RETURN"
-                                                                                                      " s")
-        for related_song in related_songs:
-            related_song_properties = related_song['s'].properties
-            nodes.append({"title": related_song_properties["name"], "label": "song"})
-            rels.append({"source": source3, "target": target3})
-            source3 += 1
-        source2 = source3
+    # print('--------------------GRAPH INFORMATION--------------------')
+    # songs_main = db.run("MATCH (s:Song) WHERE s.main = True RETURN s")
+    # for song in songs_main:
+    #     song_properties = song['s'].properties
+    #     print(song_properties)
+    #     nodes.append({"title": song_properties["name"], "label": "song"})
+    # # Target de la cancion escogida
+    # target = 0
+    # artists_main = db.run("MATCH (a:Artist) WHERE a.main = True RETURN a")
+    # for artist in artists_main:
+    #     artist_properties = artist['a'].properties
+    #     print(artist_properties)
+    #     nodes.append({"title": artist_properties["name"], "label": "artist"})
+    # # Source de grupo de la canción escogida
+    # source = 1
+    # rels.append({"source": source, "target": target})
+    # # Target2 grupo de la cancion escogida y Source2 grupos relacionados
+    # target2 = 1
+    # source2 = 2
+    # related_artists = db.run("MATCH (a:Artist) WHERE a.main = False RETURN a")
+    # for related_artist in related_artists:
+    #     related_artist_properties = related_artist['a'].properties
+    #     nodes.append({"title": related_artist_properties["name"], "label": "artist"})
+    #     rels.append({"source": source2, "target": target2})
+    #     target3 = source2
+    #     source3 = source2 + 1
+    #     related_songs = db.run("MATCH (s:Song) WHERE s.artist = \""+related_artist_properties["name"]+"\" AND s.main "
+    #                                                                                                   "= False RETURN"
+    #                                                                                                   " s")
+    #     for related_song in related_songs:
+    #         related_song_properties = related_song['s'].properties
+    #         nodes.append({"title": related_song_properties["name"], "label": "song"})
+    #         rels.append({"source": source3, "target": target3})
+    #         source3 += 1
+    #     source2 = source3
 
     for n in nodes:
         print(n)
