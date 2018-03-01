@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="98644996-83d7-4e45-9e85-44de624a0170" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tfg/Flask/songs-python-bolt" afterPath="$PROJECT_DIR$/tfg/Flask/songs-python-bolt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tfg/Flask/finalversion-songs/.cache-srivasdelgado" afterPath="$PROJECT_DIR$/tfg/Flask/finalversion-songs/.cache-srivasdelgado" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tfg/Flask/finalversion-songs/finalversion-songs.py" afterPath="$PROJECT_DIR$/tfg/Flask/finalversion-songs/finalversion-songs.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -67,8 +66,8 @@
       <file leaf-file-name="finalversion-songs.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/tfg/Flask/finalversion-songs/finalversion-songs.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="251">
-              <caret line="64" column="59" lean-forward="true" selection-start-line="64" selection-start-column="59" selection-end-line="64" selection-end-column="59" />
+            <state relative-caret-position="96">
+              <caret line="96" column="122" lean-forward="false" selection-start-line="96" selection-start-column="31" selection-end-line="96" selection-end-column="122" />
               <folding />
             </state>
           </provider>
@@ -1334,8 +1333,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/tfg/Flask/finalversion-songs/finalversion-songs.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="251">
-          <caret line="64" column="59" lean-forward="true" selection-start-line="64" selection-start-column="59" selection-end-line="64" selection-end-column="59" />
+        <state relative-caret-position="96">
+          <caret line="96" column="122" lean-forward="false" selection-start-line="96" selection-start-column="31" selection-end-line="96" selection-end-column="122" />
           <folding />
         </state>
       </provider>

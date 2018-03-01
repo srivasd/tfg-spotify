@@ -54,14 +54,14 @@ def get_index():
             song_id = result['tracks']['items'][0]['id']
 
             song_info = sp.track(song_id)
-            query = 'MATCH (s:Song) WHERE s.name = "'+song_proof+'" RETURN s'
-            results = db.run(query)
-            duplicated = ""
-            for record in results:
+            queryMainSong = 'MATCH (s:Song) WHERE s.name = "'+song_proof+'" RETURN s'
+            resultsMainSong = db.run(queryMainSong)
+            duplicatedMainSong = ""
+            for record in resultsMainSong:
                 print(record["s"].properties['name'])
-                duplicated = record["s"].properties['name']
+                duplicatedMainSong = record["s"].properties['name']
 
-            if duplicated != song_proof:
+            if duplicatedMainSong != song_proof:
                 db.run("CREATE (s:Song {name: {name}, main: {main}})",
                    {"name": song_info['name'], "main": True})
 
@@ -91,7 +91,18 @@ def get_index():
             artistId = song_info['album']['artists'][0]['id']
             print(artistId)
 
-            db.run("CREATE (ar:Artist {name: {name}, main: {main}})",
+
+
+
+            queryMainArtist = 'MATCH (a:Artist) WHERE a.name = "' + song_info['album']['artists'][0]['name'] + '" RETURN a'
+            resultsMainArtist = db.run(queryMainArtist)
+            duplicatedMainArtist = ""
+            for record in resultsMainArtist:
+                print(record["a"].properties['name'])
+                duplicatedMainArtist = record["a"].properties['name']
+
+            if duplicatedMainArtist != song_info['album']['artists'][0]['name']:
+                db.run("CREATE (ar:Artist {name: {name}, main: {main}})",
                         {"name": song_info['album']['artists'][0]['name'], "main": True})
 
             db.run("MATCH (s:Song),(ar:Artist) CREATE (s)-[r: ARTIST]->(ar) RETURN r")
