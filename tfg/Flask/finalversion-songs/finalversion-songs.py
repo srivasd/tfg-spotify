@@ -103,7 +103,7 @@ def get_index():
                         {"name": song_info['album']['artists'][0]['name'], "main": True})
 
             if duplicatedMainSong != song_proof:
-                db.run('MATCH (s:Song),(a:Artist) WHERE s.artist ="' + song_info['album']['artists'][0]['name'] + '" AND a.name ="' + song_info['album']['artists'][0]['name'] + '" CREATE (a)-[r: ARTIST_SONG]->(s) RETURN r')
+                db.run('MATCH (s:Song),(a:Artist) WHERE s.artist ="' + song_info['album']['artists'][0]['name'] + '" AND a.name ="' + song_info['album']['artists'][0]['name'] + '" CREATE (s)-[r: ARTIST_SONG]->(a) RETURN r')
             # db.run("MATCH (s:Song),(ar:Artist) CREATE (s)-[r: ARTIST]->(ar) RETURN r")
             # Related Artist's
             sp = spotipy.Spotify(auth=token)
@@ -181,9 +181,9 @@ def get_index():
                                                     duplicatedRelatedArtist = record["a"].properties['name']
 
                                                 if duplicatedRelatedArtist != related_artist['name']:
-                                                    cypher_artist = "CREATE (a:Artist {name: {name}, main: {main}})"
+                                                    cypher_artist = "CREATE (a:Artist {name: {name}, main: {main}, relatedartist: {relatedartist}})"
                                                     db.run(cypher_artist,
-                                                            {"name": related_artist['name'], "main": False})
+                                                            {"name": related_artist['name'], "main": False, "relatedartist": main_artist})
 
                                                 queryRelatedSong = 'MATCH (s:Song) WHERE s.name = "' + song['name'] + '" RETURN s'
                                                 resultsRelatedSong = db.run(queryRelatedSong)
@@ -209,8 +209,7 @@ def get_index():
                     if len(artist_albums['items']) < limit:
                         break
 
-            # db.run(
-                # 'MATCH (ar:Artist),(ar2:Artist) WHERE ar.name = "' + main_artist + "\" AND NOT ar2.name = \"" + main_artist + "\"CREATE (ar)-[r: RELATED_ARTIST]->(ar2) RETURN r")
+            db.run('MATCH (ar:Artist),(ar2:Artist) WHERE ar.name = "' + main_artist + '" AND ar2.relatedartist = "' + main_artist + '"CREATE (ar)-[r: RELATED_ARTIST]->(ar2) RETURN r')
 
         # Repeat the process
 
