@@ -51,7 +51,11 @@ def get_index():
             sp = spotipy.Spotify(auth=token)
 
             result = sp.search(song_proof, type='track')
-            song_id = result['tracks']['items'][0]['id']
+
+            for inputSong in result['tracks']['items']:
+                if inputSong['name'] == song_proof:
+                    song_id = inputSong['id']
+                    break
 
             song_info = sp.track(song_id)
             queryMainSong = 'MATCH (s:Song) WHERE s.name = "'+song_proof+'" RETURN s'
@@ -209,7 +213,7 @@ def get_index():
                     if len(artist_albums['items']) < limit:
                         break
 
-            db.run('MATCH (ar:Artist),(ar2:Artist) WHERE ar.name = "' + main_artist + '" AND ar2.relatedartist = "' + main_artist + '"CREATE (ar)-[r: RELATED_ARTIST]->(ar2) RETURN r')
+            db.run('MATCH (ar:Artist),(ar2:Artist) WHERE ar.name = "' + main_artist + '" AND ar2.relatedartist = "' + main_artist + '" CREATE (ar)-[r: RELATED_ARTIST]->(ar2) RETURN r')
 
         # Repeat the process
 
