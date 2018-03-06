@@ -4,8 +4,6 @@
     <list default="true" id="98644996-83d7-4e45-9e85-44de624a0170" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tfg/Flask/songs-python-bolt" afterPath="$PROJECT_DIR$/tfg/Flask/songs-python-bolt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tfg/API Documentation/.cache-srivasdelgado" afterPath="$PROJECT_DIR$/tfg/API Documentation/.cache-srivasdelgado" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tfg/API Documentation/SearchAlbumTracks.py" afterPath="$PROJECT_DIR$/tfg/API Documentation/SearchAlbumTracks.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tfg/Flask/finalversion-songs/.cache-srivasdelgado" afterPath="$PROJECT_DIR$/tfg/Flask/finalversion-songs/.cache-srivasdelgado" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tfg/Flask/finalversion-songs/finalversion-songs.py" afterPath="$PROJECT_DIR$/tfg/Flask/finalversion-songs/finalversion-songs.py" />
     </list>
@@ -70,8 +68,8 @@
       <file leaf-file-name="finalversion-songs.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/tfg/Flask/finalversion-songs/finalversion-songs.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="859">
-              <caret line="266" column="0" lean-forward="true" selection-start-line="266" selection-start-column="0" selection-end-line="266" selection-end-column="0" />
+            <state relative-caret-position="-1455">
+              <caret line="171" column="65" lean-forward="true" selection-start-line="171" selection-start-column="65" selection-end-line="171" selection-end-column="65" />
               <folding />
             </state>
           </provider>
@@ -936,7 +934,7 @@
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.507365" sideWeight="0.6611195" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.15548281" sideWeight="0.71331316" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.12111293" sideWeight="0.8290469" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.7528642" sideWeight="0.8290469" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24886535" sideWeight="0.18215613" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39805827" sideWeight="0.49475262" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -1339,15 +1337,15 @@
         <state relative-caret-position="387">
           <caret line="24" column="42" lean-forward="false" selection-start-line="24" selection-start-column="42" selection-end-line="24" selection-end-column="42" />
           <folding>
-            <element signature="e#0#14#0" expanded="true" />
+            <element signature="e#0#14#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/tfg/Flask/finalversion-songs/finalversion-songs.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="859">
-          <caret line="266" column="0" lean-forward="true" selection-start-line="266" selection-start-column="0" selection-end-line="266" selection-end-column="0" />
+        <state relative-caret-position="-1455">
+          <caret line="171" column="65" lean-forward="true" selection-start-line="171" selection-start-column="65" selection-end-line="171" selection-end-column="65" />
           <folding />
         </state>
       </provider>
