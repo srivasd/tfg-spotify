@@ -20,8 +20,9 @@ if token:
     limit = 50
     while True:
         album_info = sp.album_tracks(album_id, offset=offset, limit=limit)
-        offset += len(album_info['items'])
-        print(json.dumps(album_info, indent=1))
+        offset += len(album_info['items'][0])
+        # print(json.dumps(album_info, indent=1))
+        print(album_info["items"][0]["name"])
         if len(album_info['items']) < limit:
             break
 else:
