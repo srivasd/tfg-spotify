@@ -39,7 +39,11 @@ def get_index():
     song_proof = request.args.get('song', default = '', type = str)
     print("Cancion parametro: " + song_proof)
 
+    artist_proof = request.args.get('artist', default='', type=str)
+    print("Artista parametro: " + artist_proof)
+
     if song_proof != '':
+
         if token:
 
             main_features = []
@@ -52,69 +56,63 @@ def get_index():
 
             sp = spotipy.Spotify(auth=token)
 
-            result = sp.search(song_proof, type='track')
+            if song_proof != '' and artist_proof != '':
+                result = sp.search(song_proof, type='track')
+                for inputSong in result['tracks']['items']:
+                    if inputSong['name'] == song_proof and artist_proof == inputSong["album"]["artists"][0]["name"]:
+                        song_id = inputSong['id']
 
-            print(result['tracks']['items'])
+            elif song_proof != '':
+                result = sp.search(song_proof, type='track')
+                for inputSong in result['tracks']['items']:
+                    print("Prueba de input song: " + inputSong['name'])
+                    print("Artista de prueba de input song: " + inputSong["album"]["artists"][0]["name"])
 
-            for inputSong in result['tracks']['items']:
-                print("Prueba de input song: " + inputSong['name'])
-                print("Artista de prueba de input song: " + inputSong["album"]["artists"][0]["name"])
+                    queryInput = 'MATCH (s:Song) WHERE s.name = "' + song_proof + '" RETURN s'
+                    resultsInput = db.run(queryInput)
 
-                queryInput = 'MATCH (s:Song) WHERE s.name = "' + song_proof + '" RETURN s'
-                resultsInput = db.run(queryInput)
+                    for record in resultsInput:
+                        print("BBDD: " + record["s"].properties["artist"])
+                        artist_in_bbdd = record["s"].properties["artist"]
+                    # Si no se encuentra se puede buscar entre las canciones de la artista de la bbdd ------------------
+                    if inputSong['name'] == song_proof and artist_in_bbdd == inputSong["album"]["artists"][0]["name"]:
+                        song_id = inputSong['id']
 
-                for record in resultsInput:
-                    print("BBDD: " + record["s"].properties["artist"])
-                    artist_in_bbdd = record["s"].properties["artist"]
-                # Si no se encuentra se puede buscar entre las canciones de la artista de la bbdd ------------------
-                if inputSong['name'] == song_proof and artist_in_bbdd == inputSong["album"]["artists"][0]["name"]:
-                    song_id = inputSong['id']
-                    # print("Prueba artista en la posicion 0 del array: " + inputSong["album"]["artists"][0]["name"])
-                    # queryInput = 'MATCH (s:Song) WHERE s.name = "' + song_proof + '" RETURN s'
-                    # resultsInput = db.run(queryInput)
-                    # for record in resultsInput:
-                    #     print(inputSong["album"]["artists"])
-                    #     for artist in inputSong["album"]["artists"]:
-                    #         print("BBDD: " + record["s"].properties["artist"])
-                    #         print("Artista comparado: " + artist["name"])
-                    #         if record["s"].properties["artist"] == artist["name"]:
-                    #             song_id = inputSong["id"]
-                    #             break
-            if song_id == "":
-                if artist_in_bbdd != "":
-                    print("Buscamos en el artista")
-                    result_artist = sp.search(artist_in_bbdd, type='artist')
-                    result_artist_id = result_artist['artists']['items'][0]['id']
-                    print(result_artist_id)
-                    artist_albums2 = sp.artist_albums(result_artist_id)
-                    # print(json.dumps(artist_albums2, indent=1))
-                    for album in artist_albums2['items']:
-                        print(album['id'])
-                        print("Entra en el bucle 1")
-                        count = sys.maxsize
-                        offset = 0
-                        limit = 50
-                        while True:
-                            print("Entras en el while")
-                            album_info = sp.album_tracks(album['id'], offset=offset, limit=limit)
-                            print("Pasas del album info")
-                            offset += len(album_info['items'])
-                            print("Pasas del offset")
-                            # print(json.dumps(album_info, indent=1))
-                            # print(album_info['items'])
-                            for track in album_info['items']:
-                                print("Entra en el bucle 2")
-                                print(track['name'])
-                                print(track['id'])
-                                if track['name'] == song_proof:
-                                    song_id = track['id']
+                if song_id == "":
+                    if artist_in_bbdd != "":
+                        print("Buscamos en el artista")
+                        result_artist = sp.search(artist_in_bbdd, type='artist')
+                        result_artist_id = result_artist['artists']['items'][0]['id']
+                        print(result_artist_id)
+                        artist_albums2 = sp.artist_albums(result_artist_id)
+                        # print(json.dumps(artist_albums2, indent=1))
+                        for album in artist_albums2['items']:
+                            print(album['id'])
+                            print("Entra en el bucle 1")
+                            count = sys.maxsize
+                            offset = 0
+                            limit = 50
+                            while True:
+                                print("Entras en el while")
+                                album_info = sp.album_tracks(album['id'], offset=offset, limit=limit)
+                                print("Pasas del album info")
+                                offset += len(album_info['items'])
+                                print("Pasas del offset")
+                                # print(json.dumps(album_info, indent=1))
+                                # print(album_info['items'])
+                                for track in album_info['items']:
+                                    print("Entra en el bucle 2")
+                                    print(track['name'])
+                                    print(track['id'])
+                                    if track['name'] == song_proof:
+                                        song_id = track['id']
+                                        break
+                                if len(album_info['items']) < limit:
                                     break
-                            if len(album_info['items']) < limit:
-                                break
 
-            if song_id == "":
-                # El artista deberia ser dado por un input al inicio de la busqueda
-                song_id = result['tracks']['items'][0]['id']
+                if song_id == "":
+                    # El artista deberia ser dado por un input al inicio de la busqueda
+                    song_id = result['tracks']['items'][0]['id']
             song_info = sp.track(song_id)
             queryMainSong = 'MATCH (s:Song) WHERE s.name = "'+song_proof+'" RETURN s'
             resultsMainSong = db.run(queryMainSong)
@@ -272,7 +270,7 @@ def get_index():
 
             db.run('MATCH (ar:Artist),(ar2:Artist) WHERE ar.name = "' + main_artist + '" AND ar2.relatedartist = "' + main_artist + '" CREATE (ar)-[r: RELATED_ARTIST]->(ar2) RETURN r')
 
-        # Repeat the process
+            # Repeat the process
 
         else:
             print("Can't get token for", username)
