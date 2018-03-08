@@ -3,9 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="98644996-83d7-4e45-9e85-44de624a0170" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tfg/Flask/songs-python-bolt" afterPath="$PROJECT_DIR$/tfg/Flask/songs-python-bolt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tfg/Flask/finalversion-songs/.cache-srivasdelgado" afterPath="$PROJECT_DIR$/tfg/Flask/finalversion-songs/.cache-srivasdelgado" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tfg/Flask/finalversion-songs/finalversion-songs.py" afterPath="$PROJECT_DIR$/tfg/Flask/finalversion-songs/finalversion-songs.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tfg/Flask/finalversion-songs/static/index.html" afterPath="$PROJECT_DIR$/tfg/Flask/finalversion-songs/static/index.html" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -66,7 +63,7 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="finalversion-songs.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="finalversion-songs.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/tfg/Flask/finalversion-songs/finalversion-songs.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="597">
@@ -76,12 +73,15 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="index.html" pinned="false" current-in-tab="false">
+      <file leaf-file-name="index.html" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/tfg/Flask/finalversion-songs/static/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="170">
-              <caret line="16" column="51" lean-forward="false" selection-start-line="16" selection-start-column="51" selection-end-line="16" selection-end-column="51" />
-              <folding />
+            <state relative-caret-position="340">
+              <caret line="20" column="34" lean-forward="true" selection-start-line="20" selection-start-column="34" selection-end-line="20" selection-end-column="34" />
+              <folding>
+                <element signature="n#style#0;n#input#0;n#div#0;n#form#0;n#li#0;n#ul#0;n#div#0;n#div#0;n#div#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#input#1;n#div#0;n#form#0;n#li#0;n#ul#0;n#div#0;n#div#0;n#div#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -172,8 +172,8 @@
         <option value="$PROJECT_DIR$/tfg/Flask/finalversion-songs/static/index2.html" />
         <option value="$PROJECT_DIR$/tfg/API Documentation/prueba.py" />
         <option value="$PROJECT_DIR$/tfg/API Documentation/SearchAlbumTracks.py" />
-        <option value="$PROJECT_DIR$/tfg/Flask/finalversion-songs/static/index.html" />
         <option value="$PROJECT_DIR$/tfg/Flask/finalversion-songs/finalversion-songs.py" />
+        <option value="$PROJECT_DIR$/tfg/Flask/finalversion-songs/static/index.html" />
       </list>
     </option>
   </component>
@@ -1332,19 +1332,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tfg/Flask/finalversion-songs/static/index.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="16" column="51" lean-forward="false" selection-start-line="16" selection-start-column="51" selection-end-line="16" selection-end-column="51" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/tfg/Flask/finalversion-songs/finalversion-songs.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="597">
           <caret line="264" column="69" lean-forward="true" selection-start-line="264" selection-start-column="69" selection-end-line="264" selection-end-column="69" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tfg/Flask/finalversion-songs/static/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="20" column="34" lean-forward="true" selection-start-line="20" selection-start-column="34" selection-end-line="20" selection-end-column="34" />
+          <folding>
+            <element signature="n#style#0;n#input#0;n#div#0;n#form#0;n#li#0;n#ul#0;n#div#0;n#div#0;n#div#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#input#1;n#div#0;n#form#0;n#li#0;n#ul#0;n#div#0;n#div#0;n#div#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
