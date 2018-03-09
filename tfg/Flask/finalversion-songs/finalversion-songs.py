@@ -74,7 +74,6 @@ def get_index():
                     for record in resultsInput:
                         print("BBDD: " + record["s"].properties["artist"])
                         artist_in_bbdd = record["s"].properties["artist"]
-                    # Si no se encuentra se puede buscar entre las canciones de la artista de la bbdd ------------------
                     if inputSong['name'] == song_proof and artist_in_bbdd == inputSong["album"]["artists"][0]["name"]:
                         song_id = inputSong['id']
 
@@ -85,7 +84,6 @@ def get_index():
                         result_artist_id = result_artist['artists']['items'][0]['id']
                         print(result_artist_id)
                         artist_albums2 = sp.artist_albums(result_artist_id)
-                        # print(json.dumps(artist_albums2, indent=1))
                         for album in artist_albums2['items']:
                             print(album['id'])
                             print("Entra en el bucle 1")
@@ -111,7 +109,6 @@ def get_index():
                                     break
 
                 if song_id == "":
-                    # El artista deberia ser dado por un input al inicio de la busqueda
                     song_id = result['tracks']['items'][0]['id']
             song_info = sp.track(song_id)
             queryMainSong = 'MATCH (s:Song) WHERE s.name = "'+song_proof+'" RETURN s'
@@ -164,7 +161,6 @@ def get_index():
 
             if duplicatedMainSong != song_proof:
                 db.run('MATCH (s:Song),(a:Artist) WHERE s.artist ="' + song_info['album']['artists'][0]['name'] + '" AND a.name ="' + song_info['album']['artists'][0]['name'] + '" CREATE (a)-[r: ARTIST_SONG]->(s) RETURN r')
-            # db.run("MATCH (s:Song),(ar:Artist) CREATE (s)-[r: ARTIST]->(ar) RETURN r")
             # Related Artist's
             sp = spotipy.Spotify(auth=token)
             related_artists = sp.artist_related_artists(artistId)
@@ -216,7 +212,7 @@ def get_index():
                                                 change_feature = abs(actual_features[i] - main_features[i]) + change_feature
                                             i = i + 1
                                         actual_features.clear()
-                                        if change_feature < 0.5 and song not in songs_checked:
+                                        if change_feature < 0.4 and song not in songs_checked:
                                             print('Song', cont, ':', song['name'])
 
                                             print('\tDanceability:', feature['danceability'])
@@ -229,36 +225,36 @@ def get_index():
                                             print('\tValence:', feature['valence'])
                                             songs_checked.append(song)
 
-                                            if related_artist not in related_artists_checked:
-                                                related_artist_global = related_artist['name']
+                                            # if related_artist not in related_artists_checked:
+                                            related_artist_global = related_artist['name']
 
-                                                queryRelatedArtist = 'MATCH (a:Artist) WHERE a.name = "' + \
-                                                                     related_artist['name'] + '" RETURN a'
-                                                resultsRelatedArtist = db.run(queryRelatedArtist)
-                                                duplicatedRelatedArtist = ""
-                                                for record in resultsRelatedArtist:
-                                                    print(record["a"].properties['name'])
-                                                    duplicatedRelatedArtist = record["a"].properties['name']
+                                            queryRelatedArtist = 'MATCH (a:Artist) WHERE a.name = "' + \
+                                                                 related_artist['name'] + '" RETURN a'
+                                            resultsRelatedArtist = db.run(queryRelatedArtist)
+                                            duplicatedRelatedArtist = ""
+                                            for record in resultsRelatedArtist:
+                                                print(record["a"].properties['name'])
+                                                duplicatedRelatedArtist = record["a"].properties['name']
 
-                                                if duplicatedRelatedArtist != related_artist['name']:
-                                                    cypher_artist = "CREATE (a:Artist {name: {name}, main: {main}, relatedartist: {relatedartist}})"
-                                                    db.run(cypher_artist,
-                                                            {"name": related_artist['name'], "main": False, "relatedartist": main_artist})
+                                            if duplicatedRelatedArtist != related_artist['name']:
+                                                cypher_artist = "CREATE (a:Artist {name: {name}, main: {main}, relatedartist: {relatedartist}})"
+                                                db.run(cypher_artist,
+                                                        {"name": related_artist['name'], "main": False, "relatedartist": main_artist})
 
-                                                queryRelatedSong = 'MATCH (s:Song) WHERE s.name = "' + song['name'] + '" RETURN s'
-                                                resultsRelatedSong = db.run(queryRelatedSong)
-                                                duplicatedRelatedSong = ""
-                                                for record in resultsRelatedSong:
-                                                    print(record["s"].properties['name'])
-                                                    duplicatedRelatedSong = record["s"].properties['name']
+                                            queryRelatedSong = 'MATCH (s:Song) WHERE s.name = "' + song['name'] + '" RETURN s'
+                                            resultsRelatedSong = db.run(queryRelatedSong)
+                                            duplicatedRelatedSong = ""
+                                            for record in resultsRelatedSong:
+                                                print(record["s"].properties['name'])
+                                                duplicatedRelatedSong = record["s"].properties['name']
 
-                                                if duplicatedRelatedSong != song['name']:
-                                                    db.run("CREATE (s:Song {name: {name}, artist: {artist}, main: {main}})",
-                                                            {"name": song['name'], "artist": song['artists'][0]['name'], "main": False})
-                                                related_song_global = song['name']
-                                                if duplicatedRelatedSong != song['name']:
-                                                    db.run('MATCH (a { name: "' + related_artist['name'] + '" })-[r:ARTIST_SONG]->(s { artist: "' + related_artist['name'] + '"}) DELETE r')
-                                                    db.run('MATCH (s:Song),(a:Artist) WHERE s.artist ="' + related_artist['name'] +'" AND a.name ="' + related_artist['name'] +'" CREATE (a)-[r: ARTIST_SONG]->(s) RETURN r')
+                                            if duplicatedRelatedSong != song['name']:
+                                                db.run("CREATE (s:Song {name: {name}, artist: {artist}, main: {main}})",
+                                                        {"name": song['name'], "artist": song['artists'][0]['name'], "main": False})
+                                            related_song_global = song['name']
+                                            if duplicatedRelatedSong != song['name']:
+                                                db.run('MATCH (a { name: "' + related_artist['name'] + '" })-[r:ARTIST_SONG]->(s { artist: "' + related_artist['name'] + '"}) DELETE r')
+                                                db.run('MATCH (s:Song),(a:Artist) WHERE s.artist ="' + related_artist['name'] +'" AND a.name ="' + related_artist['name'] +'" CREATE (a)-[r: ARTIST_SONG]->(s) RETURN r')
                                             related_artists_checked.append(related_artist)
                                     cont += 1
 
@@ -267,6 +263,16 @@ def get_index():
                             break
                     if len(artist_albums['items']) < limit:
                         break
+
+                # Eliminamos los artistas o grupos sin canciones
+                resultsNoSongs = db.run('MATCH (s:Song) WHERE s.artist = "' + related_artist['name'] + '" RETURN s')
+                prueba = ""
+                for record in resultsNoSongs:
+                    print("prueba sin canciones----------------------------------")
+                    print(record["s"].properties['name'])
+                    prueba = prueba + record["s"].properties['name']
+                if prueba == "":
+                    db.run('MATCH (a:Artist) WHERE a.name = "' + related_artist['name'] + '" DELETE a')
 
             db.run('MATCH (ar:Artist),(ar2:Artist) WHERE ar.name = "' + main_artist + '" AND ar2.relatedartist = "' + main_artist + '" CREATE (ar)-[r: RELATED_ARTIST]->(ar2) RETURN r')
 
