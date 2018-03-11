@@ -251,6 +251,28 @@ def get_index():
                                             if duplicatedRelatedSong != song['name']:
                                                 db.run("CREATE (s:Song {name: {name}, artist: {artist}, main: {main}})",
                                                         {"name": song['name'], "artist": song['artists'][0]['name'], "main": False})
+
+                                                # Eliminamos las canciones sin grupo
+                                                resultsSong = db.run(
+                                                    'MATCH (s:Song) WHERE s.name = "' + song['name'] + '" RETURN s')
+                                                print("Hace la primera llamada a la bbdd")
+                                                pruebaCancion = ""
+                                                for record in resultsSong:
+                                                    print(record["s"].properties['artist'])
+                                                    resultArtist = db.run(
+                                                        'MATCH (a:Artist) WHERE a.name = "' + record["s"].properties[
+                                                            'artist'] + '" RETURN a')
+                                                    print("Hace la segunda llamada a la bbdd")
+
+                                                    for record2 in resultArtist:
+                                                        pruebaCancion = pruebaCancion + record2["a"].properties['name']
+
+                                                if pruebaCancion == "":
+                                                    db.run(
+                                                        'MATCH (s:Song) WHERE s.name = "' + song['name'] + '" DELETE s')
+                                                    print("Hace la tercera llamada a la bbdd")
+
+
                                             related_song_global = song['name']
                                             if duplicatedRelatedSong != song['name']:
                                                 db.run('MATCH (a { name: "' + related_artist['name'] + '" })-[r:ARTIST_SONG]->(s { artist: "' + related_artist['name'] + '"}) DELETE r')
