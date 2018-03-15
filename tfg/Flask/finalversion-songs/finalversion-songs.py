@@ -19,6 +19,9 @@ username = 'srivasdelgado'
 token = prompt_for_user_token(username, scope)
 print(token)
 
+level = 0
+initial = True
+
 
 def get_db():
     if not hasattr(g, 'neo4j_db'):
@@ -34,6 +37,9 @@ def close_db(error):
 
 @app.route("/")
 def get_index():
+    global level
+    global initial
+
     db = get_db()
 
     song_proof = request.args.get('song', default = '', type = str)
@@ -55,6 +61,21 @@ def get_index():
             artist_in_bbdd = ""
 
             sp = spotipy.Spotify(auth=token)
+
+            if not initial:
+                print("Pasa 1")
+                queryInitial = 'MATCH (s:Song) WHERE s.name = "' + song_proof + '" RETURN s'
+                print("Pasa 2")
+                resultsInitial = db.run(queryInitial)
+                print("Pasa 3")
+                for record in resultsInitial:
+                    print("Pasa 4")
+                    print(record["s"].properties['name'])
+                    print("Pasa 5")
+                    artist = record["s"].properties['artist']
+                    print("Pasa 6")
+                db.run('MATCH (a:Artist { name: "' + artist + '" }) SET a.level = a.level + 1, a.main = TRUE RETURN a')
+                print("Pasa 7")
 
             if song_proof != '' and artist_proof != '':
                 result = sp.search(song_proof, type='track')
@@ -110,17 +131,19 @@ def get_index():
 
                 if song_id == "":
                     song_id = result['tracks']['items'][0]['id']
+
             song_info = sp.track(song_id)
             queryMainSong = 'MATCH (s:Song) WHERE s.name = "'+song_proof+'" RETURN s'
             resultsMainSong = db.run(queryMainSong)
             duplicatedMainSong = ""
+
             for record in resultsMainSong:
                 print(record["s"].properties['name'])
                 duplicatedMainSong = record["s"].properties['name']
 
             if duplicatedMainSong != song_proof:
-                db.run("CREATE (s:Song {name: {name}, main: {main}, artist: {artist}})",
-                   {"name": song_info['name'], "main": True, "artist": song_info['album']['artists'][0]['name']})
+                db.run("CREATE (s:Song {name: {name}, level: {level}, artist: {artist}, main: {main}})",
+                   {"name": song_info['name'], "level": level, "artist": song_info['album']['artists'][0]['name'], "main": True})
 
             song_features = sp.audio_features(song_info['id'])
 
@@ -156,8 +179,8 @@ def get_index():
                 duplicatedMainArtist = record["a"].properties['name']
 
             if duplicatedMainArtist != song_info['album']['artists'][0]['name']:
-                db.run("CREATE (a:Artist {name: {name}, main: {main}})",
-                        {"name": song_info['album']['artists'][0]['name'], "main": True})
+                db.run("CREATE (a:Artist {name: {name}, level: {level}, main: {main}})",
+                        {"name": song_info['album']['artists'][0]['name'], "level": level, "main": True})
 
             if duplicatedMainSong != song_proof:
                 db.run('MATCH (s:Song),(a:Artist) WHERE s.artist ="' + song_info['album']['artists'][0]['name'] + '" AND a.name ="' + song_info['album']['artists'][0]['name'] + '" CREATE (a)-[r: ARTIST_SONG]->(s) RETURN r')
@@ -237,9 +260,9 @@ def get_index():
                                                 duplicatedRelatedArtist = record["a"].properties['name']
 
                                             if duplicatedRelatedArtist != related_artist['name']:
-                                                cypher_artist = "CREATE (a:Artist {name: {name}, main: {main}, relatedartist: {relatedartist}})"
+                                                cypher_artist = "CREATE (a:Artist {name: {name}, level: {level}, relatedartist: {relatedartist}, main: {main}})"
                                                 db.run(cypher_artist,
-                                                        {"name": related_artist['name'], "main": False, "relatedartist": main_artist})
+                                                        {"name": related_artist['name'], "level": level, "relatedartist": main_artist, "main": False})
 
                                             queryRelatedSong = 'MATCH (s:Song) WHERE s.name = "' + song['name'] + '" RETURN s'
                                             resultsRelatedSong = db.run(queryRelatedSong)
@@ -249,8 +272,8 @@ def get_index():
                                                 duplicatedRelatedSong = record["s"].properties['name']
 
                                             if duplicatedRelatedSong != song['name']:
-                                                db.run("CREATE (s:Song {name: {name}, artist: {artist}, main: {main}})",
-                                                        {"name": song['name'], "artist": song['artists'][0]['name'], "main": False})
+                                                db.run("CREATE (s:Song {name: {name}, artist: {artist}, level: {level}, main: {main}})",
+                                                        {"name": song['name'], "artist": song['artists'][0]['name'], "level": level, "main": False})
 
                                                 # Eliminamos las canciones sin grupo
                                                 resultsSong = db.run(
@@ -297,7 +320,8 @@ def get_index():
                     db.run('MATCH (a:Artist) WHERE a.name = "' + related_artist['name'] + '" DELETE a')
 
             db.run('MATCH (ar:Artist),(ar2:Artist) WHERE ar.name = "' + main_artist + '" AND ar2.relatedartist = "' + main_artist + '" CREATE (ar)-[r: RELATED_ARTIST]->(ar2) RETURN r')
-
+            level = level + 1
+            initial = False
             # Repeat the process
 
         else:
