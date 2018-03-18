@@ -78,8 +78,8 @@ def get_index():
                 for record in resultsInitial:
                     print(record["s"].properties['name'])
                     artist = record["s"].properties['artist']
-                db.run('MATCH (a:Artist { name: "' + artist + '" }) SET a.level = a.level + 1, a.main = TRUE RETURN a')
-                db.run('MATCH (s:Song { name: "' + song_proof + '" }) SET s.level = s.level + 1, s.main = TRUE RETURN s')
+                db.run('MATCH (a:Artist { name: "' + artist + '" }) SET a.level = ' + str(level) + ', a.main = TRUE RETURN a')
+                db.run('MATCH (s:Song { name: "' + song_proof + '" }) SET s.level = ' + str(level) + ', s.main = TRUE RETURN s')
 
             if song_proof != '' and artist_proof != '':
                 result = sp.search(song_proof, type='track')
