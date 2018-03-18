@@ -240,7 +240,7 @@ def get_index():
                                                 change_feature = abs(actual_features[i] - main_features[i]) + change_feature
                                             i = i + 1
                                         actual_features.clear()
-                                        if change_feature < 0.4 and song not in songs_checked:
+                                        if change_feature < 0.3 and song not in songs_checked:
                                             print('Song', cont, ':', song['name'])
 
                                             print('\tDanceability:', feature['danceability'])
@@ -356,7 +356,10 @@ def get_graph():
         print(song_properties)
         source = song_properties["id"]
         if initial_graph:
-            nodes.append({"title": song_properties["name"], "label": "song"})
+            if level > 5:
+                nodes.append({"title": song_properties["name"], "label": "song" + str(5)})
+            else:
+                nodes.append({"title": song_properties["name"], "label": "song"+ str(level)})
     query_artists_main = 'MATCH (a:Artist) WHERE a.main = True AND a.level = '+ str(level) +' RETURN a'
     artists_main = db.run(query_artists_main)
     for artist in artists_main:
@@ -364,7 +367,10 @@ def get_graph():
         print(artist_properties)
         target = artist_properties["id"]
         if initial_graph:
-            nodes.append({"title": artist_properties["name"], "label": "artist"})
+            if level > 5:
+                nodes.append({"title": artist_properties["name"], "label": "artist" + str(5)})
+            else:
+                nodes.append({"title": artist_properties["name"], "label": "artist"+ str(level)})
     if initial_graph:
         rels.append({"source": source, "target": target})
 
@@ -375,7 +381,10 @@ def get_graph():
     for related_artist in related_artists:
         related_artist_properties = related_artist['a'].properties
         target = related_artist_properties["id"]
-        nodes.append({"title": related_artist_properties["name"], "label": "artist"})
+        if level > 5:
+            nodes.append({"title": related_artist_properties["name"], "label": "artist" + str(5)})
+        else:
+            nodes.append({"title": related_artist_properties["name"], "label": "artist"+ str(level)})
         rels.append({"source": source, "target": target})
 
         related_songs = db.run('MATCH (s:Song) WHERE s.level = ' + str(level) + ' AND s.artist = "'+related_artist_properties["name"]+'" AND s.main = False RETURN s')
@@ -383,7 +392,10 @@ def get_graph():
         for related_song in related_songs:
             related_song_properties = related_song['s'].properties
             target = related_song_properties["id"]
-            nodes.append({"title": related_song_properties["name"], "label": "song"})
+            if level > 5:
+                nodes.append({"title": related_song_properties["name"], "label": "song" + str(5)})
+            else:
+                nodes.append({"title": related_song_properties["name"], "label": "song"+ str(level)})
             rels.append({"source": source2, "target": target})
 
     for n in nodes:

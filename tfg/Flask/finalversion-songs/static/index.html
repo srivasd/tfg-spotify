@@ -73,8 +73,16 @@
 </div>
 <style type="text/css">
     .node { stroke: #222; stroke-width: 2px; }
-    .node.song { fill: #1dff2b; }
-    .node.artist { fill: #606060; }
+    .node.song1 { fill: #1dff2b; width: 5px;}
+    .node.artist1 { fill: #606060; width: 5px;}
+    .node.song2 { fill: #1dff2b; width: 6px;}
+    .node.artist2 { fill: #606060; width: 6px;}
+    .node.song3 { fill: #1dff2b; width: 7px;}
+    .node.artist3 { fill: #606060; width: 7px;}
+    .node.song4 { fill: #1dff2b; width: 8px;}
+    .node.artist4 { fill: #606060; width: 8px;}
+    .node.song5 { fill: #1dff2b; width: 9px;}
+    .node.artist5 { fill: #606060; width: 9px;}
     .link { stroke: #999; stroke-opacity: .6; stroke-width: 1px; }
 
 </style>
@@ -131,10 +139,34 @@
                 .attr("r", 10)
                 .call(force.drag);
 
-        var songNode = svg.selectAll(".node.song")
+        var songNode1 = svg.selectAll(".node.song1")
             .on("click", songclicked);
 
-        var artistNode = svg.selectAll(".node.artist")
+        var songNode2 = svg.selectAll(".node.song2")
+            .on("click", songclicked);
+
+        var songNode3 = svg.selectAll(".node.song3")
+            .on("click", songclicked);
+
+        var songNode4 = svg.selectAll(".node.song4")
+            .on("click", songclicked);
+
+        var songNode5 = svg.selectAll(".node.song5")
+            .on("click", songclicked);
+
+        var artistNode1 = svg.selectAll(".node.artist1")
+            .on("click", artistclicked);
+
+        var artistNode2 = svg.selectAll(".node.artist2")
+            .on("click", artistclicked);
+
+        var artistNode3 = svg.selectAll(".node.artist3")
+            .on("click", artistclicked);
+
+        var artistNode4 = svg.selectAll(".node.artist4")
+            .on("click", artistclicked);
+
+        var artistNode5 = svg.selectAll(".node.artist5")
             .on("click", artistclicked);
 
         // html title attribute
