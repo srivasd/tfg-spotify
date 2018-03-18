@@ -21,11 +21,15 @@ print(token)
 
 level = 0
 initial = True
+initial_graph = True
 
 target = 0
 source = 1
 
 id = 0
+
+nodes = []
+rels = []
 
 
 def get_db():
@@ -323,7 +327,7 @@ def get_index():
                     db.run('MATCH (a:Artist) WHERE a.name = "' + related_artist['name'] + '" DELETE a')
 
             db.run('MATCH (ar:Artist),(ar2:Artist) WHERE ar.name = "' + main_artist + '" AND ar2.relatedartist = "' + main_artist + '" CREATE (ar)-[r: RELATED_ARTIST]->(ar2) RETURN r')
-            level = level + 1
+            # level = level + 1
             initial = False
             # Repeat the process
 
@@ -337,51 +341,62 @@ def get_index():
 def get_graph():
     db = get_db()
     global level
+    global initial_graph
     global target
     global source
-    nodes = []
-    rels = []
-    local_level = 0
+    global nodes
+    global rels
+
     print('--------------------GRAPH INFORMATION--------------------')
-    while local_level <= level:
-        # query_songs_main = 'MATCH (s:Song) WHERE s.main = True AND s.level = '+ str(local_level) +' RETURN s'
-        # songs_main = db.run(query_songs_main)
-        # for song in songs_main:
-        #     song_properties = song['s'].properties
-        #     print(song_properties)
-        #     nodes.append({"title": song_properties["name"], "label": "song"})
-        # query_artists_main = 'MATCH (a:Artist) WHERE a.main = True AND a.level = '+ str(local_level) +' RETURN a'
-        # artists_main = db.run(query_artists_main)
-        # for artist in artists_main:
-        #     artist_properties = artist['a'].properties
-        #     print(artist_properties)
-        #     nodes.append({"title": artist_properties["name"], "label": "artist"})
-        # rels.append({"source": source, "target": target})
-        #
-        # target2 = target + 1
-        # source2 = source + 1
-        #
-        # query_related_artists = 'MATCH (a:Artist) WHERE a.main = False AND a.level = '+ str(local_level) +' RETURN a'
-        # related_artists = db.run(query_related_artists)
-        # for related_artist in related_artists:
-        #     related_artist_properties = related_artist['a'].properties
-        #     nodes.append({"title": related_artist_properties["name"], "label": "artist"})
-        #     rels.append({"source": source2, "target": target2})
-        #     target3 = source2
-        #     source3 = source2 + 1
-        #     related_songs = db.run('MATCH (s:Song) WHERE s.level = ' + str(local_level) + ' AND s.artist = "'+related_artist_properties["name"]+'" AND s.main = False RETURN s')
-        #     for related_song in related_songs:
-        #         related_song_properties = related_song['s'].properties
-        #         nodes.append({"title": related_song_properties["name"], "label": "song"})
-        #         rels.append({"source": source3, "target": target3})
-        #         source3 += 1
-        #     source2 = source3
-        local_level = local_level + 1
+
+    query_songs_main = 'MATCH (s:Song) WHERE s.main = True AND s.level = '+ str(level) +' RETURN s'
+    songs_main = db.run(query_songs_main)
+    for song in songs_main:
+        song_properties = song['s'].properties
+        print(song_properties)
+        source = song_properties["id"]
+        if initial_graph:
+            nodes.append({"title": song_properties["name"], "label": "song"})
+    query_artists_main = 'MATCH (a:Artist) WHERE a.main = True AND a.level = '+ str(level) +' RETURN a'
+    artists_main = db.run(query_artists_main)
+    for artist in artists_main:
+        artist_properties = artist['a'].properties
+        print(artist_properties)
+        target = artist_properties["id"]
+        if initial_graph:
+            nodes.append({"title": artist_properties["name"], "label": "artist"})
+    if initial_graph:
+        rels.append({"source": source, "target": target})
+
+    query_related_artists = 'MATCH (a:Artist) WHERE a.main = False AND a.level = '+ str(level) +' RETURN a'
+    related_artists = db.run(query_related_artists)
+
+    source = target
+    for related_artist in related_artists:
+        related_artist_properties = related_artist['a'].properties
+        target = related_artist_properties["id"]
+        nodes.append({"title": related_artist_properties["name"], "label": "artist"})
+        rels.append({"source": source, "target": target})
+
+        related_songs = db.run('MATCH (s:Song) WHERE s.level = ' + str(level) + ' AND s.artist = "'+related_artist_properties["name"]+'" AND s.main = False RETURN s')
+        source2 = target
+        for related_song in related_songs:
+            related_song_properties = related_song['s'].properties
+            target = related_song_properties["id"]
+            nodes.append({"title": related_song_properties["name"], "label": "song"})
+            rels.append({"source": source2, "target": target})
 
     for n in nodes:
         print(n)
     for r in rels:
         print(r)
+
+    if level > 1:
+        initial_graph = False
+    print("Antes de la llamada: ", level)
+    level = level + 1
+    print("Despues de la llamada: ", level)
+
     print(Response(dumps({"nodes": nodes, "links": rels}),
                    mimetype="application/json"))
     return Response(dumps({"nodes": nodes, "links": rels}),
@@ -389,4 +404,5 @@ def get_graph():
 
 
 if __name__ == '__main__':
+    level = 0
     app.run(port=8080)
