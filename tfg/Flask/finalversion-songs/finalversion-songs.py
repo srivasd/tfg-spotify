@@ -24,7 +24,7 @@ initial = True
 initial_graph = True
 
 target = 0
-source = 1
+source = 0
 
 id = 0
 
@@ -240,7 +240,7 @@ def get_index():
                                                 change_feature = abs(actual_features[i] - main_features[i]) + change_feature
                                             i = i + 1
                                         actual_features.clear()
-                                        if change_feature < 0.3 and song not in songs_checked:
+                                        if change_feature < 0.4 and song not in songs_checked:
                                             print('Song', cont, ':', song['name'])
 
                                             print('\tDanceability:', feature['danceability'])
@@ -341,18 +341,21 @@ def get_index():
 def get_graph():
     db = get_db()
     global level
-    global initial_graph
     global target
     global source
+    global initial_graph
     global nodes
     global rels
 
     print('--------------------GRAPH INFORMATION--------------------')
 
+    aux = ""
+
     query_songs_main = 'MATCH (s:Song) WHERE s.main = True AND s.level = '+ str(level) +' RETURN s'
     songs_main = db.run(query_songs_main)
     for song in songs_main:
         song_properties = song['s'].properties
+        aux = "aux"
         print(song_properties)
         source = song_properties["id"]
         if initial_graph:
@@ -360,6 +363,7 @@ def get_graph():
                 nodes.append({"title": song_properties["name"], "label": "song" + str(5)})
             else:
                 nodes.append({"title": song_properties["name"], "label": "song"+ str(level)})
+
     query_artists_main = 'MATCH (a:Artist) WHERE a.main = True AND a.level = '+ str(level) +' RETURN a'
     artists_main = db.run(query_artists_main)
     for artist in artists_main:
@@ -371,8 +375,8 @@ def get_graph():
                 nodes.append({"title": artist_properties["name"], "label": "artist" + str(5)})
             else:
                 nodes.append({"title": artist_properties["name"], "label": "artist"+ str(level)})
-    if initial_graph:
-        rels.append({"source": source, "target": target})
+        if initial_graph:
+            rels.append({"source": source, "target": target})
 
     query_related_artists = 'MATCH (a:Artist) WHERE a.main = False AND a.level = '+ str(level) +' RETURN a'
     related_artists = db.run(query_related_artists)
@@ -384,10 +388,10 @@ def get_graph():
         if level > 5:
             nodes.append({"title": related_artist_properties["name"], "label": "artist" + str(5)})
         else:
-            nodes.append({"title": related_artist_properties["name"], "label": "artist"+ str(level)})
+            nodes.append({"title": related_artist_properties["name"], "label": "artist" + str(level)})
         rels.append({"source": source, "target": target})
 
-        related_songs = db.run('MATCH (s:Song) WHERE s.level = ' + str(level) + ' AND s.artist = "'+related_artist_properties["name"]+'" AND s.main = False RETURN s')
+        related_songs = db.run('MATCH (s:Song) WHERE s.level = ' + str(level) + ' AND s.artist = "' + related_artist_properties["name"] + '" AND s.main = False RETURN s')
         source2 = target
         for related_song in related_songs:
             related_song_properties = related_song['s'].properties
@@ -395,7 +399,8 @@ def get_graph():
             if level > 5:
                 nodes.append({"title": related_song_properties["name"], "label": "song" + str(5)})
             else:
-                nodes.append({"title": related_song_properties["name"], "label": "song"+ str(level)})
+                nodes.append({"title": related_song_properties["name"], "label": "song" + str(level)})
+            print("Valor del ultimo target: ", target)
             rels.append({"source": source2, "target": target})
 
     for n in nodes:
@@ -403,11 +408,12 @@ def get_graph():
     for r in rels:
         print(r)
 
-    if level > 1:
-        initial_graph = False
     print("Antes de la llamada: ", level)
     level = level + 1
     print("Despues de la llamada: ", level)
+
+    if aux != "":
+        initial_graph = False
 
     print(Response(dumps({"nodes": nodes, "links": rels}),
                    mimetype="application/json"))
@@ -416,5 +422,4 @@ def get_graph():
 
 
 if __name__ == '__main__':
-    level = 0
     app.run(port=8080)
