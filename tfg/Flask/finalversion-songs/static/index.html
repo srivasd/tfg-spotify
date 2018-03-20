@@ -133,15 +133,15 @@
                     return "node "+d.label })
                 .attr("r", function (d) {
                     if(d.label == 'song1' || d.label == "artist1"){
-                        return 6;
+                        return 5;
                     } else if (d.label == 'song2' || d.label == "artist2") {
                         return 8;
                     } else if (d.label == 'song3' || d.label == "artist3") {
-                        return 10;
+                        return 11;
                     } else if (d.label == 'song4' || d.label == "artist4") {
-                        return 12;
-                    } else {
                         return 14;
+                    } else {
+                        return 17;
                     }
                 })
                 .call(force.drag);

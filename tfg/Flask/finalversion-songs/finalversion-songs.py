@@ -403,6 +403,21 @@ def get_graph():
             print("Valor del ultimo target: ", target)
             rels.append({"source": source2, "target": target})
 
+    # Nuevas canciones de un artista ya disponible en la bbdd
+    previous_related_artists = db.run('MATCH (a:Artist) WHERE a.level < ' + str(level) + ' RETURN a')
+    for previous_related_artist in previous_related_artists:
+        previous_related_artist_properties = previous_related_artist["a"].properties
+        source = previous_related_artist_properties["id"]
+        actual_related_songs = db.run('MATCH (s:Song) WHERE s.level = ' + str(level) + ' AND s.artist = "' + previous_related_artist_properties["name"] + '" RETURN s')
+        for actual_related_song in actual_related_songs:
+            actual_related_song_properties = actual_related_song["s"].properties
+            if level > 5:
+                nodes.append({"title": actual_related_song_properties["name"], "label": "song" + str(5)})
+            else:
+                nodes.append({"title": actual_related_song_properties["name"], "label": "song" + str(level)})
+            target = actual_related_song_properties["id"]
+            rels.append({"source": source, "target": target})
+
     for n in nodes:
         print(n)
     for r in rels:
