@@ -54,12 +54,12 @@ def start_runner():
             try:
                 r = requests.get('http://127.0.0.1:8080/graph')
                 if r.status_code == 200:
-                    print('Server started, quiting start_loop')
+                    print('/graph 200 Status')
                     not_started = True
                     # not_started = False
                 print(r.status_code)
             except:
-                print('Server not yet started')
+                print('/graph status error')
             time.sleep(15)
 
     print('Started runner')
@@ -84,7 +84,7 @@ def get_index():
     if song_proof != '':
 
         if token:
-
+            level = level + 1
             main_features = []
             actual_features = []
             songs_checked = []
@@ -394,6 +394,7 @@ def get_index():
 
 @app.route("/graph")
 def get_graph():
+
     db = get_db()
     global level
     global target
@@ -556,9 +557,9 @@ def get_graph():
     for r in rels:
         print(r)
 
-    print("Antes de la llamada: ", level)
-    level = level + 1
-    print("Despues de la llamada: ", level)
+    # print("Antes de la llamada: ", level)
+    # level = level + 1
+    print("Nivel de la llamada: ", level)
 
     if aux != "":
         initial_graph = False
@@ -570,5 +571,5 @@ def get_graph():
 
 
 if __name__ == '__main__':
-    start_runner()
+    # start_runner()
     app.run(port=8080)
