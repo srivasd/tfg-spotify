@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 from json import dumps
-from sys import maxsize
 
 import spotipy
 import sys
-from flask import Flask, g, Response, request, json
+from flask import Flask, g, Response, request
 from neo4j.v1 import GraphDatabase, basic_auth
-from spotipy import Spotify
 from spotipy.util import prompt_for_user_token
+
+import threading
+import time
+import requests
 
 app = Flask(__name__, static_url_path='/static/')
 driver = GraphDatabase.driver('bolt://localhost', auth=basic_auth("neo4j", "neo4j"))
@@ -42,6 +44,27 @@ def get_db():
 def close_db(error):
     if hasattr(g, 'neo4j_db'):
         g.neo4j_db.close()
+
+
+def start_runner():
+    def start_loop():
+        not_started = True
+        while not_started:
+            print('In start loop')
+            try:
+                r = requests.get('http://127.0.0.1:8080/graph')
+                if r.status_code == 200:
+                    print('Server started, quiting start_loop')
+                    not_started = True
+                    # not_started = False
+                print(r.status_code)
+            except:
+                print('Server not yet started')
+            time.sleep(15)
+
+    print('Started runner')
+    thread = threading.Thread(target=start_loop)
+    thread.start()
 
 
 @app.route("/")
@@ -547,4 +570,5 @@ def get_graph():
 
 
 if __name__ == '__main__':
+    start_runner()
     app.run(port=8080)
