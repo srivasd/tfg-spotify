@@ -112,6 +112,14 @@
             .attr("width", "100%").attr("height", "100%")
             .attr("pointer-events", "all");
 
+
+    function recargar() {
+        while(true) {
+            window.location.href = "/graph";
+            setTimeout(recargar(), 10000);
+        }
+    }
+
     function songclicked() {
         console.log(d3.select(this)[0][0].__data__.title);
             d3.select(this).transition()

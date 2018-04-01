@@ -65,6 +65,8 @@ def start_runner():
     print('Started runner')
     thread = threading.Thread(target=start_loop)
     thread.start()
+    # Probarloooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+    app.background_thread = thread
 
 
 @app.route("/")
@@ -219,7 +221,6 @@ def get_index():
                                 album_songs = sp.album_tracks(artist_albums_id, offset=offset, limit=limit)
                                 offset += len(album_songs['items'])
                                 cont = 1
-                                print(album_songs['items'])
                                 for song in album_songs['items']:
                                     track_info = sp.audio_features(song['id'])
                                     for feature in track_info:
@@ -389,31 +390,38 @@ def get_graph():
     source = target
     for related_artist in related_artists:
         related_artist_properties = related_artist['a'].properties
-        # target = related_artist_properties["id"]
         if level > 5:
             related_artist_graph = {"id": related_artist_properties["id"], "title": related_artist_properties["name"], "label": "artist" + str(5)}
-            nodes.append(related_artist_graph)
+            if related_artist_graph not in nodes:
+                nodes.append(related_artist_graph)
         else:
             related_artist_graph = {"id": related_artist_properties["id"], "title": related_artist_properties["name"], "label": "artist" + str(level)}
-            nodes.append(related_artist_graph)
+            if related_artist_graph not in nodes:
+                nodes.append(related_artist_graph)
         target = nodes.index(related_artist_graph)
-        rels.append({"source": source, "target": target})
+        artist_relatedartist_rel = {"source": source, "target": target}
+        if artist_relatedartist_rel not in rels:
+            rels.append({"source": source, "target": target})
         related_songs = db.run('MATCH (s:Song) WHERE s.level = ' + str(level) + ' AND s.artist = "' + related_artist_properties["name"] + '" AND s.main = False RETURN s')
         source2 = target
         for related_song in related_songs:
             related_song_properties = related_song['s'].properties
             if level > 5:
                 related_song_graph = {"id": related_song_properties["id"], "title": related_song_properties["name"], "label": "song" + str(5)}
-                nodes.append(related_song_graph)
+                if related_song_graph not in nodes:
+                    nodes.append(related_song_graph)
             else:
                 related_song_graph = {"id": related_song_properties["id"], "title": related_song_properties["name"], "label": "song" + str(level)}
                 for n in nodes:
                     if n["title"] == related_song_properties["name"]:
                         related_song_graph = n
                         break
-                nodes.append(related_song_graph)
+                if related_song_graph not in nodes:
+                    nodes.append(related_song_graph)
             target = nodes.index(related_song_graph)
-            rels.append({"source": source2, "target": target})
+            relatedartist_relatedsong_rel = {"source": source2, "target": target}
+            if relatedartist_relatedsong_rel not in rels:
+                rels.append({"source": source2, "target": target})
 
     # Nuevas canciones de un artista ya disponible en la bbdd
     previous_related_artists = db.run('MATCH (a:Artist) WHERE a.level < ' + str(level) + ' RETURN a')
@@ -430,16 +438,20 @@ def get_graph():
             actual_related_song_properties = actual_related_song["s"].properties
             if level > 5:
                 previous_related_song_graph = {"id": actual_related_song_properties["id"], "title": actual_related_song_properties["name"], "label": "song" + str(5)}
-                nodes.append(previous_related_song_graph)
+                if previous_related_song_graph not in nodes:
+                    nodes.append(previous_related_song_graph)
             else:
                 previous_related_song_graph = {"id": actual_related_song_properties["id"], "title": actual_related_song_properties["name"], "label": "song" + str(level)}
                 for n in nodes:
                     if n["title"] == actual_related_song_properties["name"]:
                         previous_related_song_graph = n
                         break
-                nodes.append(previous_related_song_graph)
+                if previous_related_song_graph not in nodes:
+                    nodes.append(previous_related_song_graph)
             target = nodes.index(previous_related_song_graph)
-            rels.append({"source": source, "target": target})
+            other_level_songs_rel = {"source": source, "target": target}
+            if other_level_songs_rel not in rels:
+                rels.append({"source": source, "target": target})
 
     for n in nodes:
         print(n)
@@ -458,5 +470,5 @@ def get_graph():
 
 
 if __name__ == '__main__':
-    # start_runner()
+    start_runner()
     app.run(port=8080)
