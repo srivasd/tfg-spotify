@@ -27,7 +27,7 @@
             <div class="navbar-header col-sm-6 col-md-6">
                 <div class="logo-well">
                     <a href="http://neo4j.com">
-                    <img src="http://neo4j-contrib.github.io/developer-resources/language-guides/assets/img/logo-white.svg" alt="Neo4j World's Leading Graph Database" id="logo">
+                    <img src="spotify.png" alt="Neo4j World's Leading Graph Database" id="logo">
                     </a>
                 </div>
                 <div class="navbar-brand">
@@ -43,13 +43,16 @@
     </div>
     <div class="col-md-6">
         <div class="panel panel-default">
-            <div class="panel-heading" id="title"></div>
+            <div class="panel-heading"><h3 id="title"></h3></div>
             <div class="row">
                 <div class="col-sm-6 col-md-6">
                     <img src="" class="well" id="poster"/>
                 </div>
                 <div class="col-md-6 col-sm-6">
+                    <br>
                     <h3 id="title2"></h3>
+                    <br>
+                    <br>
                     <ul id="songdetails">
                     </ul>
                 </div>
@@ -87,11 +90,11 @@
                         $("#title").text(data.song_clicked.name);
                         $("#poster").attr("src", data.song_clicked.image);
 
-                        $list.append($("<li>" + "Album name: " + data.song_clicked.albumname + "</li>"));
-                        $list.append($("<li>" + "Artist: " + data.song_clicked.artist + "</li>"));
-                        $list.append($("<li>" + "Duration: " + data.song_clicked.duration + "</li>"));
-                        $list.append($("<li>" + "Popularity: " + data.song_clicked.popularity + "/100 </li>"));
-                        $list.append($("<li>" + "Release date: " + data.song_clicked.releasedate + "</li>"));
+                        $list.append($("<li><h4><b>" + "Album name: </b>" + data.song_clicked.albumname + "</h4></li>"));
+                        $list.append($("<li><h4><b>" + "Artist: </b>" + data.song_clicked.artist + "</h4></li>"));
+                        $list.append($("<li><h4><b>" + "Duration: </b>" + data.song_clicked.duration + "</h4></li>"));
+                        $list.append($("<li><h4><b>" + "Popularity: </b>" + data.song_clicked.popularity + "/100 </h4></li>"));
+                        $list.append($("<li><h4><b>" + "Release date: </b>" + data.song_clicked.releasedate + "</h4></li>"));
                     }
                 }, "json");
         }
@@ -118,7 +121,8 @@
         console.log(d3.select(this)[0][0].__data__.title);
             d3.select(this).transition()
                     .style("fill", "red")
-        window.open("https://open.spotify.com/search/songs/" + d3.select(this)[0][0].__data__.title, '_blank');
+        //window.open("https://open.spotify.com/search/songs/" + d3.select(this)[0][0].__data__.title, '_blank');
+        window.open("https://open.spotify.com/track/" + d3.select(this)[0][0].__data__.uri, '_blank');
         window.location.href = "/?song=" + d3.select(this)[0][0].__data__.title;
     }
 
@@ -126,7 +130,8 @@
         console.log(d3.select(this)[0][0].__data__.title);
             d3.select(this).transition()
                     .style("fill", "red")
-        window.open("https://open.spotify.com/search/artists/" + d3.select(this)[0][0].__data__.title, '_blank');
+        //window.open("https://open.spotify.com/search/artists/" + d3.select(this)[0][0].__data__.title, '_blank');
+        window.open("https://open.spotify.com/artist/" + d3.select(this)[0][0].__data__.uri, '_blank');
     }
 
     d3.json("/graph", function(error, graph) {

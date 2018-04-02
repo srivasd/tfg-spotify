@@ -202,10 +202,9 @@ def get_index():
                 duplicatedMainSong = record["s"].properties['name']
 
             if duplicatedMainSong != song_proof:
-                print(song_info['preview_url'])
-                db.run("CREATE (s:Song {name: {name}, level: {level}, artist: {artist}, main: {main}, id: {id}, popularity: {popularity}, duration: {duration}, albumname: {albumname}, releasedate: {releasedate}, image: {image}})",
+                db.run("CREATE (s:Song {name: {name}, level: {level}, artist: {artist}, main: {main}, id: {id}, popularity: {popularity}, duration: {duration}, albumname: {albumname}, releasedate: {releasedate}, image: {image}, uri: {uri}})",
                        {"name": song_info['name'], "level": level, "artist": song_info['album']['artists'][0]['name'],
-                        "main": True, "id": id, "popularity": song_info['popularity'], "duration": song_duration, "albumname": song_info['album']['name'], "releasedate": song_info['album']['release_date'], "image": song_info['album']['images'][1]['url']})
+                        "main": True, "id": id, "popularity": song_info['popularity'], "duration": song_duration, "albumname": song_info['album']['name'], "releasedate": song_info['album']['release_date'], "image": song_info['album']['images'][1]['url'], "uri": song_info['id']})
                 id = id + 1
 
             song_features = sp.audio_features(song_info['id'])
@@ -242,8 +241,8 @@ def get_index():
                 duplicatedMainArtist = record["a"].properties['name']
 
             if duplicatedMainArtist != song_info['album']['artists'][0]['name']:
-                db.run("CREATE (a:Artist {name: {name}, level: {level}, main: {main}, id: {id}})",
-                       {"name": song_info['album']['artists'][0]['name'], "level": level, "main": True, "id": id})
+                db.run("CREATE (a:Artist {name: {name}, level: {level}, main: {main}, id: {id}, uri: {uri}})",
+                       {"name": song_info['album']['artists'][0]['name'], "level": level, "main": True, "id": id, "uri": song_info['album']['artists'][0]['id']})
                 id = id + 1
             if duplicatedMainSong != song_proof:
                 db.run('MATCH (s:Song),(a:Artist) WHERE s.artist ="' + song_info['album']['artists'][0][
@@ -316,10 +315,10 @@ def get_index():
                                                 duplicatedRelatedArtist = record["a"].properties['name']
 
                                             if duplicatedRelatedArtist != related_artist['name']:
-                                                cypher_artist = "CREATE (a:Artist {name: {name}, level: {level}, relatedartist: {relatedartist}, main: {main}, id: {id}})"
+                                                cypher_artist = "CREATE (a:Artist {name: {name}, level: {level}, relatedartist: {relatedartist}, main: {main}, id: {id}, uri: {uri}})"
                                                 db.run(cypher_artist,
                                                        {"name": related_artist['name'], "level": level,
-                                                        "relatedartist": main_artist, "main": False, "id": id})
+                                                        "relatedartist": main_artist, "main": False, "id": id, "uri": related_artist['id']})
                                                 id = id + 1
 
                                                 db.run(
@@ -349,11 +348,11 @@ def get_index():
                                                 print(song_info['preview_url'])
 
                                                 db.run(
-                                                    "CREATE (s:Song {name: {name}, artist: {artist}, level: {level}, main: {main}, id: {id}, popularity: {popularity}, duration: {duration}, albumname: {albumname}, releasedate: {releasedate}, image: {image}})",
+                                                    "CREATE (s:Song {name: {name}, artist: {artist}, level: {level}, main: {main}, id: {id}, popularity: {popularity}, duration: {duration}, albumname: {albumname}, releasedate: {releasedate}, image: {image}, uri: {uri}})",
                                                     {"name": song['name'], "artist": song['artists'][0]['name'],
-                                                     "level": level, "main": False, "id": id, "popularity": song_info['popularity'], "duration": song_duration, "albumname": song_info['album']['name'], "releasedate": song_info['album']['release_date'], "image": song_info['album']['images'][1]['url']})
+                                                     "level": level, "main": False, "id": id, "popularity": song_info['popularity'], "duration": song_duration, "albumname": song_info['album']['name'], "releasedate": song_info['album']['release_date'], "image": song_info['album']['images'][1]['url'], "uri": song_info['id']})
                                                 id = id + 1
-
+                                                print("Pasa del CREATE")
                                                 # Eliminamos las canciones sin grupo
                                                 resultsSong = db.run(
                                                     'MATCH (s:Song) WHERE s.name = "' + song['name'] + '" RETURN s')
@@ -433,14 +432,14 @@ def get_graph():
         song_properties = song['s'].properties
         aux = "aux"
         if level > 5:
-            main_song_graph = {"id": song_properties["id"], "title": song_properties["name"], "label": "song" + str(5)}
+            main_song_graph = {"id": song_properties["id"], "title": song_properties["name"], "label": "song" + str(5), "uri": song_properties["uri"]}
             if initial_graph:
                 nodes.append(main_song_graph)
         else:
 
             if initial_graph:
                 main_song_graph = {"id": song_properties["id"], "title": song_properties["name"],
-                                   "label": "song" + str(level)}
+                                   "label": "song" + str(level), "uri": song_properties["uri"]}
                 nodes.append(main_song_graph)
             else:
                 for n in nodes:
@@ -455,13 +454,13 @@ def get_graph():
         artist_properties = artist['a'].properties
         if level > 5:
             main_artist_graph = {"id": artist_properties["id"], "title": artist_properties["name"],
-                                 "label": "artist" + str(5)}
+                                 "label": "artist" + str(5), "uri": artist_properties["uri"]}
             if initial_graph:
                 nodes.append(main_artist_graph)
         else:
             if initial_graph:
                 main_artist_graph = {"id": artist_properties["id"], "title": artist_properties["name"],
-                                     "label": "artist" + str(level)}
+                                     "label": "artist" + str(level), "uri": artist_properties["uri"]}
                 nodes.append(main_artist_graph)
             else:
                 for n in nodes:
@@ -479,12 +478,12 @@ def get_graph():
         related_artist_properties = related_artist['a'].properties
         if level > 5:
             related_artist_graph = {"id": related_artist_properties["id"], "title": related_artist_properties["name"],
-                                    "label": "artist" + str(5)}
+                                    "label": "artist" + str(5), "uri": related_artist_properties["uri"]}
             if related_artist_graph not in nodes:
                 nodes.append(related_artist_graph)
         else:
             related_artist_graph = {"id": related_artist_properties["id"], "title": related_artist_properties["name"],
-                                    "label": "artist" + str(level)}
+                                    "label": "artist" + str(level), "uri": related_artist_properties["uri"]}
             if related_artist_graph not in nodes:
                 nodes.append(related_artist_graph)
         target = nodes.index(related_artist_graph)
@@ -499,12 +498,12 @@ def get_graph():
             related_song_properties = related_song['s'].properties
             if level > 5:
                 related_song_graph = {"id": related_song_properties["id"], "title": related_song_properties["name"],
-                                      "label": "song" + str(5)}
+                                      "label": "song" + str(5), "uri": related_song_properties["uri"]}
                 if related_song_graph not in nodes:
                     nodes.append(related_song_graph)
             else:
                 related_song_graph = {"id": related_song_properties["id"], "title": related_song_properties["name"],
-                                      "label": "song" + str(level)}
+                                      "label": "song" + str(level), "uri": related_song_properties["uri"]}
                 for n in nodes:
                     if n["title"] == related_song_properties["name"]:
                         related_song_graph = n
@@ -522,7 +521,7 @@ def get_graph():
         previous_related_artist_properties = previous_related_artist["a"].properties
         previous_related_artist_graph = {"id": previous_related_artist_properties["id"],
                                          "title": previous_related_artist_properties["name"],
-                                         "label": "artist" + str(previous_related_artist_properties["level"])}
+                                         "label": "artist" + str(previous_related_artist_properties["level"]), "uri": previous_related_artist_properties["uri"]}
         for n in nodes:
             if n["title"] == previous_related_artist_properties["name"]:
                 previous_related_artist_graph = n
@@ -536,13 +535,13 @@ def get_graph():
             if level > 5:
                 previous_related_song_graph = {"id": actual_related_song_properties["id"],
                                                "title": actual_related_song_properties["name"],
-                                               "label": "song" + str(5)}
+                                               "label": "song" + str(5), "uri": actual_related_song_properties["uri"]}
                 if previous_related_song_graph not in nodes:
                     nodes.append(previous_related_song_graph)
             else:
                 previous_related_song_graph = {"id": actual_related_song_properties["id"],
                                                "title": actual_related_song_properties["name"],
-                                               "label": "song" + str(level)}
+                                               "label": "song" + str(level), "uri": actual_related_song_properties["uri"]}
                 for n in nodes:
                     if n["title"] == actual_related_song_properties["name"]:
                         previous_related_song_graph = n
