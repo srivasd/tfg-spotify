@@ -2,6 +2,10 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="http://neo4j-contrib.github.io/developer-resources/language-guides/assets/css/main.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="shortcut icon" href="https://www.shareicon.net/data/16x16/2016/08/01/639870_internet_512x512.png">
     <title>Spotify Recommendation System</title>
 </head>
 
@@ -19,7 +23,7 @@
                                 <input type="text" style="width: 49%;" placeholder="Search for Song Title" class="form-control" name="song">
                                 <input type="text" style="width: 49%;" placeholder="Search for Artist Name" class="form-control" name="artist">
                             </div>
-                            <button class="btn btn-default">Search</button>
+                            <button class="btn btn-default">Search <span class="glyphicon glyphicon-search"></span></button>
                         </form>
                     </li>
                 </ul>
@@ -27,11 +31,11 @@
             <div class="navbar-header col-sm-6 col-md-6">
                 <div class="logo-well">
                     <a href="http://neo4j.com">
-                    <img src="spotify.png" alt="Neo4j World's Leading Graph Database" id="logo">
+                    <img src="https://www.shareicon.net/data/64x64/2016/08/01/639870_internet_512x512.png" alt="Spotify logo" id="logo">
                     </a>
                 </div>
                 <div class="navbar-brand">
-                    <div class="brand">Spotify Recommendation System</div>
+                    <div class="brand">  Spotify Recommendation System</div>
                 </div>
             </div>
         </div>
@@ -87,14 +91,14 @@
                     var $list = $("#songdetails").empty();
                     if (data.song_clicked.albumname !== "") {
                         $("#title2").text("Song Details");
-                        $("#title").text(data.song_clicked.name);
+                        $("#title").text(data.song_clicked.name + " ").append($("<span class=\"glyphicon glyphicon-headphones\"></span>"));
                         $("#poster").attr("src", data.song_clicked.image);
 
-                        $list.append($("<li><h4><b>" + "Album name: </b>" + data.song_clicked.albumname + "</h4></li>"));
-                        $list.append($("<li><h4><b>" + "Artist: </b>" + data.song_clicked.artist + "</h4></li>"));
-                        $list.append($("<li><h4><b>" + "Duration: </b>" + data.song_clicked.duration + "</h4></li>"));
-                        $list.append($("<li><h4><b>" + "Popularity: </b>" + data.song_clicked.popularity + "/100 </h4></li>"));
-                        $list.append($("<li><h4><b>" + "Release date: </b>" + data.song_clicked.releasedate + "</h4></li>"));
+                        $list.append($("<li><h4><b>" + "Album name: </b>" + data.song_clicked.albumname + "  <span class=\"glyphicon glyphicon-cd\"></span></h4></li>"));
+                        $list.append($("<li><h4><b>" + "Artist: </b>" + data.song_clicked.artist + "  <span class=\"glyphicon glyphicon-user\"></span></h4></li>"));
+                        $list.append($("<li><h4><b>" + "Duration: </b>" + data.song_clicked.duration + "  <span class=\"glyphicon glyphicon-time\"></span></h4></li>"));
+                        $list.append($("<li><h4><b>" + "Popularity: </b>" + data.song_clicked.popularity + "/100  <span class=\"glyphicon glyphicon-signal\"></span></h4></li>"));
+                        $list.append($("<li><h4><b>" + "Release date: </b>" + data.song_clicked.releasedate + "  <span class=\"glyphicon glyphicon-calendar\"></span></h4></li>"));
                     }
                 }, "json");
         }

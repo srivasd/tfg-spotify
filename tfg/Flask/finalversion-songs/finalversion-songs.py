@@ -1,9 +1,9 @@
 #!/usr/bin/env python
+import os
 from json import dumps
 
 import spotipy
-import json
-from flask import Flask, g, Response, request
+from flask import Flask, g, Response, request, send_from_directory
 from neo4j.v1 import GraphDatabase, basic_auth
 from spotipy.util import prompt_for_user_token
 
@@ -66,6 +66,12 @@ def start_runner():
     thread = threading.Thread(target=start_loop)
     thread.start()
     app.background_thread = thread
+
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
 @app.route("/details")
@@ -275,7 +281,6 @@ def get_index():
                                 offset += len(album_songs['items'])
                                 cont = 1
                                 for song in album_songs['items']:
-                                    # print(json.dumps(song, indent=1))
                                     track_info = sp.audio_features(song['id'])
                                     for feature in track_info:
                                         change_feature = 0
@@ -345,14 +350,11 @@ def get_index():
                                                 duration_s = duration_s * 60
                                                 song_duration = "Min: " + str(i) + " Seg: " + str(round(duration_s, 0))
 
-                                                print(song_info['preview_url'])
-
                                                 db.run(
                                                     "CREATE (s:Song {name: {name}, artist: {artist}, level: {level}, main: {main}, id: {id}, popularity: {popularity}, duration: {duration}, albumname: {albumname}, releasedate: {releasedate}, image: {image}, uri: {uri}})",
                                                     {"name": song['name'], "artist": song['artists'][0]['name'],
                                                      "level": level, "main": False, "id": id, "popularity": song_info['popularity'], "duration": song_duration, "albumname": song_info['album']['name'], "releasedate": song_info['album']['release_date'], "image": song_info['album']['images'][1]['url'], "uri": song_info['id']})
                                                 id = id + 1
-                                                print("Pasa del CREATE")
                                                 # Eliminamos las canciones sin grupo
                                                 resultsSong = db.run(
                                                     'MATCH (s:Song) WHERE s.name = "' + song['name'] + '" RETURN s')
