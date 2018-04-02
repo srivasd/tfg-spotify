@@ -43,14 +43,14 @@
     </div>
     <div class="col-md-6">
         <div class="panel panel-default">
-            <div class="panel-heading" id="title">Details</div>
+            <div class="panel-heading" id="title"></div>
             <div class="row">
-                <div class="col-sm-4 col-md-4">
+                <div class="col-sm-6 col-md-6">
                     <img src="" class="well" id="poster"/>
                 </div>
-                <div class="col-md-8 col-sm-8">
-                    <h4>Artist</h4>
-                    <ul id="crew">
+                <div class="col-md-6 col-sm-6">
+                    <h3 id="title2"></h3>
+                    <ul id="songdetails">
                     </ul>
                 </div>
             </div>
@@ -74,31 +74,33 @@
 
 <script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 <script src="http://d3js.org/d3.v3.min.js" type="text/javascript"></script>
-<script type="text/javascript"></script>
+<script type="text/javascript">
+
+    $(function () {
+        function showDetails() {
+            $.get("/details",
+                function (data) {
+                    console.log(data);
+                    var $list = $("#songdetails").empty();
+                    if (data.song_clicked.albumname !== "") {
+                        $("#title2").text("Song Details");
+                        $("#title").text(data.song_clicked.name);
+                        $("#poster").attr("src", data.song_clicked.image);
+
+                        $list.append($("<li>" + "Album name: " + data.song_clicked.albumname + "</li>"));
+                        $list.append($("<li>" + "Artist: " + data.song_clicked.artist + "</li>"));
+                        $list.append($("<li>" + "Duration: " + data.song_clicked.duration + "</li>"));
+                        $list.append($("<li>" + "Popularity: " + data.song_clicked.popularity + "/100 </li>"));
+                        $list.append($("<li>" + "Release date: " + data.song_clicked.releasedate + "</li>"));
+                    }
+                }, "json");
+        }
+        showDetails()
+    })
+
+</script>
 
 <script type="text/javascript">
-    /*const neo4j = require('neo4j-driver').v1;
-
-    const driver = neo4j.driver('bolt://localhost', neo4j.auth.basic("neo4j", "neo4j"));
-    const session = driver.session();
-    const personName = 'Alice';
-    const resultPromise = session.run(
-        'CREATE (a:Person {name: $name}) RETURN a',
-        {name: personName}
-    )
-
-    resultPromise.then(function(result) {
-        session.close();
-        const singleRecord = result.records[0];
-        const node = singleRecord.get(0);
-
-        console.log(node.properties.name);
-
-        // on application exit:
-        driver.close();
-    });*/
-
-
 
     var width = 1024, height = 768;
 
@@ -111,14 +113,6 @@
     var svg = d3.select("#graph").append("svg")
             .attr("width", "100%").attr("height", "100%")
             .attr("pointer-events", "all");
-
-
-    function recargar() {
-        while(true) {
-            window.location.href = "/graph";
-            setTimeout(recargar(), 10000);
-        }
-    }
 
     function songclicked() {
         console.log(d3.select(this)[0][0].__data__.title);
@@ -152,9 +146,6 @@
         });
 
         force.nodes(graph.nodes).links(graph.links).start();
-
-        console.log(graph.nodes);
-        console.log(graph.links);
 
         var link = svg.selectAll(".link")
                 .data(graph.links).enter()
@@ -216,7 +207,6 @@
 
         // force feed algo ticks
         force.on("tick", function() {
-            console.log("Entra en el tick!!!!");
             link.attr("x1", function(d) { return d.source.x; })
                     .attr("y1", function(d) { return d.source.y; })
                     .attr("x2", function(d) { return d.target.x; })
