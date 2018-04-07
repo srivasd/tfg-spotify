@@ -23,7 +23,7 @@
                                 <input type="text" style="width: 49%;" placeholder="Search for Song Title" class="form-control" name="song">
                                 <input type="text" style="width: 49%;" placeholder="Search for Artist Name" class="form-control" name="artist">
                             </div>
-                            <button class="btn btn-default">Search <span class="glyphicon glyphicon-search"></span></button>
+                            <button class="btn btn-default" id="search">Search <span class="glyphicon glyphicon-search"></span></button>
                         </form>
                     </li>
                 </ul>
@@ -44,6 +44,12 @@
 
 <div class="row">
     <div class="col-md-6">
+        <div id="Espere">
+            <img src="http://datainflow.com/wp-content/uploads/2017/09/loader.gif" class="center"> </img>
+        </div>
+        <div id="Espere2">
+            <img src="https://www.airbare.com.hk/_nuxt/img/logo_loading.fb960ed.gif" height="150px"> </img>
+        </div>
     </div>
     <div class="col-md-6">
         <div class="panel panel-default">
@@ -77,13 +83,46 @@
     .node.artist5 { stroke: #606060; fill: #606060; }
     .link { stroke: #999; stroke-opacity: .6; stroke-width: 2px; }
 
+    .center {
+        margin-left: auto;
+        margin-right: auto;
+        vertical-align: middle;
+        display: block;
+    }
+
+    #Espere2 img {
+        float: left;
+    }
+
+    #poster {
+        max-width: 90%;
+    }
+
+    ul {
+        margin-left: -20px;
+        margin-top: -20px;
+    }
+
 </style>
 
 <script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 <script src="http://d3js.org/d3.v3.min.js" type="text/javascript"></script>
+
 <script type="text/javascript">
 
     $(function () {
+
+        $('#Espere').hide();
+
+        $("#search").click(function () {
+            $('#Espere').fadeIn(1000);
+        });
+
+        $(window).load( function(){
+            $('#Espere').fadeOut(1000);
+            $('#Espere2').fadeOut(1000);
+        });
+
         function showDetails() {
             $.get("/details",
                 function (data) {
@@ -102,14 +141,15 @@
                     }
                 }, "json");
         }
-        showDetails()
+        showDetails();
+
     })
 
 </script>
 
 <script type="text/javascript">
 
-    var width = 1024, height = 768;
+    var width = 800, height = 800;
 
     var force = d3.layout.force()
                 .gravity(0.05)
@@ -125,24 +165,23 @@
         console.log(d3.select(this)[0][0].__data__.title);
             d3.select(this).transition()
                     .style("fill", "red")
-        //window.open("https://open.spotify.com/search/songs/" + d3.select(this)[0][0].__data__.title, '_blank');
         window.open("https://open.spotify.com/track/" + d3.select(this)[0][0].__data__.uri, '_blank');
         window.location.href = "/?song=" + d3.select(this)[0][0].__data__.title;
+        $(function () {
+            $("#Espere2").fadeIn(1000);
+        });
     }
 
     function artistclicked() {
         console.log(d3.select(this)[0][0].__data__.title);
             d3.select(this).transition()
                     .style("fill", "red")
-        //window.open("https://open.spotify.com/search/artists/" + d3.select(this)[0][0].__data__.title, '_blank');
         window.open("https://open.spotify.com/artist/" + d3.select(this)[0][0].__data__.uri, '_blank');
     }
 
     d3.json("/graph", function(error, graph) {
 		if (error) return;
 
-		// Find blank links, which give the error
-        // "Uncaught TypeError: Cannot read property 'weight' of undefined"
         graph.links.forEach(function(link, index, list) {
             if (typeof graph.nodes[link.source] === 'undefined') {
                 console.log('undefined source', link);
