@@ -98,10 +98,8 @@ def get_index():
     db = get_db()
 
     song_proof = request.args.get('song', default='', type=str)
-    # print("Cancion parametro: " + song_proof)
 
     artist_proof = request.args.get('artist', default='', type=str)
-    # print("Artista parametro: " + artist_proof)
 
     if song_proof != '':
 
@@ -135,8 +133,6 @@ def get_index():
             elif song_proof != '':
                 result = sp.search(song_proof, type='track')
                 for inputSong in result['tracks']['items']:
-                    # print("Prueba de input song: " + inputSong['name'])
-                    # print("Artista de prueba de input song: " + inputSong["album"]["artists"][0]["name"])
 
                     queryInput = 'MATCH (s:Song) WHERE s.name = "' + song_proof + '" RETURN s'
                     resultsInput = db.run(queryInput)
@@ -193,29 +189,27 @@ def get_index():
 
             song_features = sp.audio_features(song_info['id'])
 
-            # print(song_info['name'])
             for feature in song_features:
-                # print('\tDanceability:', feature['danceability'])
+
                 main_features.append(feature['danceability'])
-                # print('\tEnergy:', feature['energy'])
+
                 main_features.append(feature['energy'])
-                # print('\tLiveness:', feature['liveness'])
+
                 main_features.append(feature['liveness'])
-                # print('\tMode:', feature['mode'])
+
                 main_features.append(feature['mode'])
-                # print('\tSpeechiness:', feature['speechiness'])
+
                 main_features.append(feature['speechiness'])
-                # print('\tAcousticness:', feature['acousticness'])
+
                 main_features.append(feature['acousticness'])
-                # print('\tInstrumentalness:', feature['instrumentalness'])
+
                 main_features.append(feature['instrumentalness'])
-                # print('\tValence:', feature['valence'])
+
                 main_features.append(feature['valence'])
 
             # Song's artist
             main_artist = song_info['album']['artists'][0]['name']
             artistId = song_info['album']['artists'][0]['id']
-            # print(main_artist)
 
             queryMainArtist = 'MATCH (a:Artist) WHERE a.name = "' + song_info['album']['artists'][0][
                 'name'] + '" RETURN a'
@@ -236,7 +230,7 @@ def get_index():
             related_artists = sp.artist_related_artists(artistId)
 
             for related_artist in related_artists['artists']:
-                # print(related_artist['name'])
+
                 # Artist's related songs to the first one
                 # Artist's albums
 
@@ -278,16 +272,7 @@ def get_index():
                                             i = i + 1
                                         actual_features.clear()
                                         if change_feature < 0.4 and song not in songs_checked:
-                                            # print('Song', cont, ':', song['name'])
-                                            #
-                                            # print('\tDanceability:', feature['danceability'])
-                                            # print('\tEnergy:', feature['energy'])
-                                            # print('\tLiveness:', feature['liveness'])
-                                            # print('\tMode:', feature['mode'])
-                                            # print('\tSpeechiness:', feature['speechiness'])
-                                            # print('\tAcousticness:', feature['acousticness'])
-                                            # print('\tInstrumentalness:', feature['instrumentalness'])
-                                            # print('\tValence:', feature['valence'])
+
                                             songs_checked.append(song)
 
                                             queryRelatedArtist = 'MATCH (a:Artist) WHERE a.name = "' + \
@@ -402,15 +387,13 @@ def get_graph():
     global nodes
     global rels
 
-    # print('--------------------GRAPH INFORMATION--------------------')
-
-    aux = ""
+    is_initial = ""
 
     query_songs_main = 'MATCH (s:Song) WHERE s.main = True AND s.level = ' + str(level) + ' RETURN s'
     songs_main = db.run(query_songs_main)
     for song in songs_main:
         song_properties = song['s'].properties
-        aux = "aux"
+        is_initial = "is_initial"
         if level > 5:
             main_song_graph = {"id": song_properties["id"], "title": song_properties["name"], "label": "song" + str(5), "uri": song_properties["uri"]}
             if initial_graph:
@@ -533,18 +516,9 @@ def get_graph():
             if other_level_songs_rel not in rels:
                 rels.append({"source": source, "target": target})
 
-    # for n in nodes:
-    #     print(n)
-    # for r in rels:
-    #     print(r)
-
-    # print("Nivel de la llamada: ", level)
-
-    if aux != "":
+    if is_initial != "":
         initial_graph = False
 
-    # print(Response(dumps({"nodes": nodes, "links": rels}),
-    #                mimetype="application/json"))
     return Response(dumps({"nodes": nodes, "links": rels}),
                     mimetype="application/json")
 
