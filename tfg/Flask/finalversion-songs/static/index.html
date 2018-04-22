@@ -44,9 +44,6 @@
 
 <div class="row">
     <div class="col-md-6">
-        <div id="Espere">
-            <img src="http://datainflow.com/wp-content/uploads/2017/09/loader.gif" class="center"> </img>
-        </div>
         <div id="Espere2">
             <img src="https://www.airbare.com.hk/_nuxt/img/logo_loading.fb960ed.gif" height="150px"> </img>
         </div>
@@ -55,6 +52,7 @@
         <div class="panel panel-default">
             <div class="panel-heading"><h3 id="title"></h3></div>
             <div class="row">
+
                 <div class="col-sm-6 col-md-6">
                     <img src="" class="well" id="poster"/>
                 </div>
@@ -65,6 +63,9 @@
                     <br>
                     <ul id="songdetails">
                     </ul>
+                </div>
+                <div id="Espere3">
+                    <img src="http://datainflow.com/wp-content/uploads/2017/09/loader.gif" class="center"> </img>
                 </div>
             </div>
         </div>
@@ -298,20 +299,19 @@
 
     $(function () {
 
-        $('#Espere').hide();
         $('#Espere2').hide();
 
         $("#search").click(function () {
-            $('#Espere2').fadeIn(1000);
+            $('#Espere2').fadeIn(500);
+            $('#Espere3').fadeIn(500);
         });
 
         $(window).load( function(){
-            $('#Espere2').fadeOut(1000);
+            $('#Espere2').fadeOut(500);
+            $('#Espere3').fadeOut(500);
         });
 
         function showDetails() {
-
-            var level_aux = 0;
 
             const graph_nodes = "MATCH (s:Song) WHERE s.main = TRUE RETURN s";
 
@@ -327,6 +327,9 @@
                 console.log(data);
                 var $list = $("#songdetails").empty();
                 if (data.records.length > 0) {
+                    $(function () {
+                        $("#Espere3").fadeOut(500);
+                    });
                     $("#title2").text("Song Details");
                     $("#title").text(song_selected.properties.name + " ").append($("<span class=\"glyphicon glyphicon-headphones\"></span>"));
                     $("#poster").attr("src", song_selected.properties.image);
