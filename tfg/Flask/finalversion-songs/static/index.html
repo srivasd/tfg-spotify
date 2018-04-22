@@ -107,80 +107,104 @@
 
 <script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 <script src="http://d3js.org/d3.v3.min.js" type="text/javascript"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/neo4j-driver@1.5.3/lib/browser/neo4j-web.min.js"></script>
 <script type="text/javascript">
 
-    $(function () {
+    var graph = {
+        nodes: [],
+        links: []
+    };
 
-        $('#Espere').hide();
+    var session;
+    function connect() {
+        const host = 'bolt://localhost';
+        const driver = neo4j.v1.driver(host, neo4j.v1.auth.basic("neo4j", "neo4j"));
 
-        $("#search").click(function () {
-            $('#Espere').fadeIn(1000);
-        });
+        session = driver.session();
+        console.log(session);
+        console.log("Se ha establecido conexion");
+        bbdd_nodes(session);
+        return session;
+    }
 
-        $(window).load( function(){
-            $('#Espere').fadeOut(1000);
-            $('#Espere2').fadeOut(1000);
-        });
+    function bbdd_nodes(session) {
 
-        function showDetails() {
-            $.get("/details",
-                function (data) {
-                    console.log(data);
-                    var $list = $("#songdetails").empty();
-                    if (data.song_clicked.albumname !== "") {
-                        $("#title2").text("Song Details");
-                        $("#title").text(data.song_clicked.name + " ").append($("<span class=\"glyphicon glyphicon-headphones\"></span>"));
-                        $("#poster").attr("src", data.song_clicked.image);
+        const graph_links = "MATCH (n)-[r]->(n2) RETURN n, n2";
+        const graph_nodes = "MATCH (n) RETURN n";
 
-                        $list.append($("<li><h4><b>" + "Album name: </b>" + data.song_clicked.albumname + "  <span class=\"glyphicon glyphicon-cd\"></span></h4></li>"));
-                        $list.append($("<li><h4><b>" + "Artist: </b>" + data.song_clicked.artist + "  <span class=\"glyphicon glyphicon-user\"></span></h4></li>"));
-                        $list.append($("<li><h4><b>" + "Duration: </b>" + data.song_clicked.duration + "  <span class=\"glyphicon glyphicon-time\"></span></h4></li>"));
-                        $list.append($("<li><h4><b>" + "Popularity: </b>" + data.song_clicked.popularity + "/100  <span class=\"glyphicon glyphicon-signal\"></span></h4></li>"));
-                        $list.append($("<li><h4><b>" + "Release date: </b>" + data.song_clicked.releasedate + "  <span class=\"glyphicon glyphicon-calendar\"></span></h4></li>"));
+        session.run(graph_nodes).then(function (result_nodes) {
+            session.close();
+            if(result_nodes.records.length > graph.nodes.length) {
+                graph.nodes = [];
+                for (i = 0; i < result_nodes.records.length; i++) {
+                    if (result_nodes.records[i]._fields[0].labels[0] === "Artist") {
+                        node = {
+                            "id": result_nodes.records[i]._fields[0].properties.id,
+                            "title": result_nodes.records[i]._fields[0].properties.name,
+                            "label": "artist" + result_nodes.records[i]._fields[0].properties.level,
+                            "uri": result_nodes.records[i]._fields[0].properties.uri
+                        };
+                    } else {
+                        node = {
+                            "id": result_nodes.records[i]._fields[0].properties.id,
+                            "title": result_nodes.records[i]._fields[0].properties.name,
+                            "label": "song" + result_nodes.records[i]._fields[0].properties.level,
+                            "uri": result_nodes.records[i]._fields[0].properties.uri
+                        };
                     }
-                }, "json");
-        }
-        showDetails();
+                    graph.nodes.push(node);
+                }
+                draw_graph(graph);
 
-    })
+                session.run(graph_links).then(function (result_links) {
+                    session.close();
+                    if (result_links.records.length > graph.links.length) {
+                        graph.links = [];
+                        for (var i in result_links.records) {
+                            var link = {};
+                            for (var j in graph.nodes) {
+                                if (graph.nodes[j].uri === result_links.records[i]._fields[0].properties.uri) {
+                                    link.source = graph.nodes[j].index;
+                                    break;
+                                }
+                            }
+                            for (var j in graph.nodes) {
+                                if (graph.nodes[j].uri === result_links.records[i]._fields[1].properties.uri) {
+                                    link.target = graph.nodes[j].index;
+                                    break;
+                                }
+                            }
+                            graph.links.push(link);
+                          }
+                        draw_graph(graph);
+                    }
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            }
+        }).catch(function (error) {
+            console.log(error);
+        });
 
-</script>
+    }
 
-<script type="text/javascript">
+    function draw_graph(graph) {
 
-    var width = 800, height = 800;
+        var width = 800, height = 800;
 
-    var force = d3.layout.force()
+        var force = d3.layout.force()
                 .gravity(0.05)
                 .distance(100)
                 .charge(-100)
                 .size([width, height]);
 
-    var svg = d3.select("#graph").append("svg")
+        d3.select("svg").remove();
+
+        var svg = d3.select("#graph").append("svg")
             .attr("width", "100%").attr("height", "100%")
             .attr("pointer-events", "all");
 
-    function songclicked() {
-        console.log(d3.select(this)[0][0].__data__.title);
-            d3.select(this).transition()
-                    .style("fill", "red")
-        window.open("https://open.spotify.com/track/" + d3.select(this)[0][0].__data__.uri, '_blank');
-        window.location.href = "/?song=" + d3.select(this)[0][0].__data__.title;
-        $(function () {
-            $("#Espere2").fadeIn(1000);
-        });
-    }
-
-    function artistclicked() {
-        console.log(d3.select(this)[0][0].__data__.title);
-            d3.select(this).transition()
-                    .style("fill", "red")
-        window.open("https://open.spotify.com/artist/" + d3.select(this)[0][0].__data__.uri, '_blank');
-    }
-
-    d3.json("/graph", function(error, graph) {
-		if (error) return;
+        console.log(graph);
 
         graph.links.forEach(function(link, index, list) {
             if (typeof graph.nodes[link.source] === 'undefined') {
@@ -263,7 +287,170 @@
             node.attr("cx", function(d) { return d.x; })
                     .attr("cy", function(d) { return d.y; });
         });
-    });
+    }
+    connect();
+    setInterval(function(){
+        bbdd_nodes(session);
+    }, 5000);
+</script>
+
+<script type="text/javascript">
+
+    $(function () {
+
+        $('#Espere').hide();
+        $('#Espere2').hide();
+
+        $("#search").click(function () {
+            $('#Espere2').fadeIn(1000);
+        });
+
+        $(window).load( function(){
+            $('#Espere2').fadeOut(1000);
+        });
+
+        function showDetails() {
+
+            var level_aux = 0;
+
+            const graph_nodes = "MATCH (s:Song) WHERE s.main = TRUE RETURN s";
+
+            session.run(graph_nodes).then(function (data) {
+                var song_selected;
+                var level_song_selected = 0;
+                for (j = 0; j < data.records.length; j++) {
+                    if (data.records[j]._fields[0].properties.level > level_song_selected) {
+                        level_song_selected = data.records[j]._fields[0].properties.level;
+                        song_selected = data.records[j]._fields[0];
+                    }
+                }
+                console.log(data);
+                var $list = $("#songdetails").empty();
+                if (data.records.length > 0) {
+                    $("#title2").text("Song Details");
+                    $("#title").text(song_selected.properties.name + " ").append($("<span class=\"glyphicon glyphicon-headphones\"></span>"));
+                    $("#poster").attr("src", song_selected.properties.image);
+
+                    $list.append($("<li><h4><b>" + "Album name: </b>" + song_selected.properties.albumname + "  <span class=\"glyphicon glyphicon-cd\"></span></h4></li>"));
+                    $list.append($("<li><h4><b>" + "Artist: </b>" + song_selected.properties.artist + "  <span class=\"glyphicon glyphicon-user\"></span></h4></li>"));
+                    $list.append($("<li><h4><b>" + "Duration: </b>" + song_selected.properties.duration + "  <span class=\"glyphicon glyphicon-time\"></span></h4></li>"));
+                    $list.append($("<li><h4><b>" + "Popularity: </b>" + song_selected.properties.popularity + "/100  <span class=\"glyphicon glyphicon-signal\"></span></h4></li>"));
+                    $list.append($("<li><h4><b>" + "Release date: </b>" + song_selected.properties.releasedate + "  <span class=\"glyphicon glyphicon-calendar\"></span></h4></li>"));
+                }
+            });
+        }
+        showDetails();
+        setInterval(showDetails, 5000);
+
+    })
+
+</script>
+
+<script type="text/javascript">
+
+    function songclicked() {
+        console.log(d3.select(this)[0][0].__data__.title);
+            d3.select(this).transition()
+                    .style("fill", "red")
+        window.open("https://open.spotify.com/track/" + d3.select(this)[0][0].__data__.uri, '_blank');
+        window.location.href = "/?song=" + d3.select(this)[0][0].__data__.title;
+        $(function () {
+            $("#Espere2").fadeIn(1000);
+        });
+    }
+
+    function artistclicked() {
+        console.log(d3.select(this)[0][0].__data__.title);
+            d3.select(this).transition()
+                    .style("fill", "red")
+        window.open("https://open.spotify.com/artist/" + d3.select(this)[0][0].__data__.uri, '_blank');
+    }
+
+    /*d3.json("/graph", function(error, graph) {
+		if (error) return;
+        console.log(graph);
+        graph.links.forEach(function(link, index, list) {
+            if (typeof graph.nodes[link.source] === 'undefined') {
+                console.log('undefined source', link);
+                graph.nodes[link.source] = graph.nodes[link.target];
+            }
+            if (typeof graph.nodes[link.target] === 'undefined') {
+                console.log('undefined target', link);
+                graph.nodes[link.target] = graph.nodes[link.source];
+            }
+        });
+
+        force.nodes(graph.nodes).links(graph.links).start();
+
+        var link = svg.selectAll(".link")
+                .data(graph.links).enter()
+                .append("line").attr("class", "link");
+
+        var node = svg.selectAll(".node")
+                .data(graph.nodes).enter()
+                .append("circle")
+                .attr("class", function (d) {
+                    return "node "+d.label })
+                .attr("r", function (d) {
+                    if(d.label == 'song1' || d.label == "artist1"){
+                        return 5;
+                    } else if (d.label == 'song2' || d.label == "artist2") {
+                        return 8;
+                    } else if (d.label == 'song3' || d.label == "artist3") {
+                        return 11;
+                    } else if (d.label == 'song4' || d.label == "artist4") {
+                        return 14;
+                    } else {
+                        return 17;
+                    }
+                })
+                .call(force.drag);
+
+        var songNode1 = svg.selectAll(".node.song1")
+            .on("click", songclicked);
+
+        var songNode2 = svg.selectAll(".node.song2")
+            .on("click", songclicked);
+
+        var songNode3 = svg.selectAll(".node.song3")
+            .on("click", songclicked);
+
+        var songNode4 = svg.selectAll(".node.song4")
+            .on("click", songclicked);
+
+        var songNode5 = svg.selectAll(".node.song5")
+            .on("click", songclicked);
+
+        var artistNode1 = svg.selectAll(".node.artist1")
+            .on("click", artistclicked);
+
+        var artistNode2 = svg.selectAll(".node.artist2")
+            .on("click", artistclicked);
+
+        var artistNode3 = svg.selectAll(".node.artist3")
+            .on("click", artistclicked);
+
+        var artistNode4 = svg.selectAll(".node.artist4")
+            .on("click", artistclicked);
+
+        var artistNode5 = svg.selectAll(".node.artist5")
+            .on("click", artistclicked);
+
+        // html title attribute
+        node.append("title")
+                .text(function (d) { return d.title; })
+
+        // force feed algo ticks
+        force.on("tick", function() {
+            link.attr("x1", function(d) { return d.source.x; })
+                    .attr("y1", function(d) { return d.source.y; })
+                    .attr("x2", function(d) { return d.target.x; })
+                    .attr("y2", function(d) { return d.target.y; });
+
+            node.attr("cx", function(d) { return d.x; })
+                    .attr("cy", function(d) { return d.y; });
+        });
+    });*/
 </script>
 </body>
 </html>

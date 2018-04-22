@@ -377,150 +377,151 @@ def get_index():
     return app.send_static_file('index.html')
 
 
-@app.route("/graph")
-def get_graph():
-    db = get_db()
-    global level
-    global target
-    global source
-    global initial_graph
-    global nodes
-    global rels
-
-    is_initial = ""
-
-    query_songs_main = 'MATCH (s:Song) WHERE s.main = True AND s.level = ' + str(level) + ' RETURN s'
-    songs_main = db.run(query_songs_main)
-    for song in songs_main:
-        song_properties = song['s'].properties
-        is_initial = "is_initial"
-        if level > 5:
-            main_song_graph = {"id": song_properties["id"], "title": song_properties["name"], "label": "song" + str(5), "uri": song_properties["uri"]}
-            if initial_graph:
-                nodes.append(main_song_graph)
-        else:
-
-            if initial_graph:
-                main_song_graph = {"id": song_properties["id"], "title": song_properties["name"],
-                                   "label": "song" + str(level), "uri": song_properties["uri"]}
-                nodes.append(main_song_graph)
-            else:
-                for n in nodes:
-                    if n["title"] == song_properties["name"]:
-                        main_song_graph = n
-                        break
-        source = nodes.index(main_song_graph)
-
-    query_artists_main = 'MATCH (a:Artist) WHERE a.main = True AND a.level = ' + str(level) + ' RETURN a'
-    artists_main = db.run(query_artists_main)
-    for artist in artists_main:
-        artist_properties = artist['a'].properties
-        if level > 5:
-            main_artist_graph = {"id": artist_properties["id"], "title": artist_properties["name"],
-                                 "label": "artist" + str(5), "uri": artist_properties["uri"]}
-            if initial_graph:
-                nodes.append(main_artist_graph)
-        else:
-            if initial_graph:
-                main_artist_graph = {"id": artist_properties["id"], "title": artist_properties["name"],
-                                     "label": "artist" + str(level), "uri": artist_properties["uri"]}
-                nodes.append(main_artist_graph)
-            else:
-                for n in nodes:
-                    if n["title"] == artist_properties["name"]:
-                        main_artist_graph = n
-                        break
-        target = nodes.index(main_artist_graph)
-        if initial_graph:
-            rels.append({"source": source, "target": target})
-
-    query_related_artists = 'MATCH (a:Artist) WHERE a.main = False AND a.level = ' + str(level) + ' RETURN a'
-    related_artists = db.run(query_related_artists)
-    source = target
-    for related_artist in related_artists:
-        related_artist_properties = related_artist['a'].properties
-        if level > 5:
-            related_artist_graph = {"id": related_artist_properties["id"], "title": related_artist_properties["name"],
-                                    "label": "artist" + str(5), "uri": related_artist_properties["uri"]}
-            if related_artist_graph not in nodes:
-                nodes.append(related_artist_graph)
-        else:
-            related_artist_graph = {"id": related_artist_properties["id"], "title": related_artist_properties["name"],
-                                    "label": "artist" + str(level), "uri": related_artist_properties["uri"]}
-            if related_artist_graph not in nodes:
-                nodes.append(related_artist_graph)
-        target = nodes.index(related_artist_graph)
-        artist_relatedartist_rel = {"source": source, "target": target}
-        if artist_relatedartist_rel not in rels:
-            rels.append({"source": source, "target": target})
-        related_songs = db.run(
-            'MATCH (s:Song) WHERE s.level = ' + str(level) + ' AND s.artist = "' + related_artist_properties[
-                "name"] + '" AND s.main = False RETURN s')
-        source2 = target
-        for related_song in related_songs:
-            related_song_properties = related_song['s'].properties
-            if level > 5:
-                related_song_graph = {"id": related_song_properties["id"], "title": related_song_properties["name"],
-                                      "label": "song" + str(5), "uri": related_song_properties["uri"]}
-                if related_song_graph not in nodes:
-                    nodes.append(related_song_graph)
-            else:
-                related_song_graph = {"id": related_song_properties["id"], "title": related_song_properties["name"],
-                                      "label": "song" + str(level), "uri": related_song_properties["uri"]}
-                for n in nodes:
-                    if n["title"] == related_song_properties["name"]:
-                        related_song_graph = n
-                        break
-                if related_song_graph not in nodes:
-                    nodes.append(related_song_graph)
-            target = nodes.index(related_song_graph)
-            relatedartist_relatedsong_rel = {"source": source2, "target": target}
-            if relatedartist_relatedsong_rel not in rels:
-                rels.append({"source": source2, "target": target})
-
-    # Nuevas canciones de un artista ya disponible en la bbdd
-    previous_related_artists = db.run('MATCH (a:Artist) WHERE a.level < ' + str(level) + ' RETURN a')
-    for previous_related_artist in previous_related_artists:
-        previous_related_artist_properties = previous_related_artist["a"].properties
-        previous_related_artist_graph = {"id": previous_related_artist_properties["id"],
-                                         "title": previous_related_artist_properties["name"],
-                                         "label": "artist" + str(previous_related_artist_properties["level"]), "uri": previous_related_artist_properties["uri"]}
-        for n in nodes:
-            if n["title"] == previous_related_artist_properties["name"]:
-                previous_related_artist_graph = n
-                break
-        source = nodes.index(previous_related_artist_graph)
-        actual_related_songs = db.run(
-            'MATCH (s:Song) WHERE s.level = ' + str(level) + ' AND s.artist = "' + previous_related_artist_properties[
-                "name"] + '" RETURN s')
-        for actual_related_song in actual_related_songs:
-            actual_related_song_properties = actual_related_song["s"].properties
-            if level > 5:
-                previous_related_song_graph = {"id": actual_related_song_properties["id"],
-                                               "title": actual_related_song_properties["name"],
-                                               "label": "song" + str(5), "uri": actual_related_song_properties["uri"]}
-                if previous_related_song_graph not in nodes:
-                    nodes.append(previous_related_song_graph)
-            else:
-                previous_related_song_graph = {"id": actual_related_song_properties["id"],
-                                               "title": actual_related_song_properties["name"],
-                                               "label": "song" + str(level), "uri": actual_related_song_properties["uri"]}
-                for n in nodes:
-                    if n["title"] == actual_related_song_properties["name"]:
-                        previous_related_song_graph = n
-                        break
-                if previous_related_song_graph not in nodes:
-                    nodes.append(previous_related_song_graph)
-            target = nodes.index(previous_related_song_graph)
-            other_level_songs_rel = {"source": source, "target": target}
-            if other_level_songs_rel not in rels:
-                rels.append({"source": source, "target": target})
-
-    if is_initial != "":
-        initial_graph = False
-
-    return Response(dumps({"nodes": nodes, "links": rels}),
-                    mimetype="application/json")
+# @app.route("/graph")
+# def get_graph():
+#     db = get_db()
+#     global level
+#     global target
+#     global source
+#     global initial_graph
+#     global nodes
+#     global rels
+#
+#     is_initial = ""
+#
+#     query_songs_main = 'MATCH (s:Song) WHERE s.main = True AND s.level = ' + str(level) + ' RETURN s'
+#     songs_main = db.run(query_songs_main)
+#     for song in songs_main:
+#         song_properties = song['s'].properties
+#         is_initial = "is_initial"
+#         if level > 5:
+#             main_song_graph = {"id": song_properties["id"], "title": song_properties["name"], "label": "song" + str(5), "uri": song_properties["uri"]}
+#             if initial_graph:
+#                 nodes.append(main_song_graph)
+#         else:
+#
+#             if initial_graph:
+#                 main_song_graph = {"id": song_properties["id"], "title": song_properties["name"],
+#                                    "label": "song" + str(level), "uri": song_properties["uri"]}
+#                 nodes.append(main_song_graph)
+#             else:
+#                 for n in nodes:
+#                     if n["title"] == song_properties["name"]:
+#                         main_song_graph = n
+#                         break
+#         source = nodes.index(main_song_graph)
+#
+#     query_artists_main = 'MATCH (a:Artist) WHERE a.main = True AND a.level = ' + str(level) + ' RETURN a'
+#     artists_main = db.run(query_artists_main)
+#     for artist in artists_main:
+#         artist_properties = artist['a'].properties
+#         if level > 5:
+#             main_artist_graph = {"id": artist_properties["id"], "title": artist_properties["name"],
+#                                  "label": "artist" + str(5), "uri": artist_properties["uri"]}
+#             if initial_graph:
+#                 nodes.append(main_artist_graph)
+#         else:
+#             if initial_graph:
+#                 main_artist_graph = {"id": artist_properties["id"], "title": artist_properties["name"],
+#                                      "label": "artist" + str(level), "uri": artist_properties["uri"]}
+#                 nodes.append(main_artist_graph)
+#             else:
+#                 for n in nodes:
+#                     if n["title"] == artist_properties["name"]:
+#                         main_artist_graph = n
+#                         break
+#         target = nodes.index(main_artist_graph)
+#         if initial_graph:
+#             rels.append({"source": source, "target": target})
+#
+#     query_related_artists = 'MATCH (a:Artist) WHERE a.main = False AND a.level = ' + str(level) + ' RETURN a'
+#     related_artists = db.run(query_related_artists)
+#     source = target
+#     for related_artist in related_artists:
+#         related_artist_properties = related_artist['a'].properties
+#         if level > 5:
+#             related_artist_graph = {"id": related_artist_properties["id"], "title": related_artist_properties["name"],
+#                                     "label": "artist" + str(5), "uri": related_artist_properties["uri"]}
+#             if related_artist_graph not in nodes:
+#                 nodes.append(related_artist_graph)
+#         else:
+#             related_artist_graph = {"id": related_artist_properties["id"], "title": related_artist_properties["name"],
+#                                     "label": "artist" + str(level), "uri": related_artist_properties["uri"]}
+#             if related_artist_graph not in nodes:
+#                 nodes.append(related_artist_graph)
+#         target = nodes.index(related_artist_graph)
+#         artist_relatedartist_rel = {"source": source, "target": target}
+#         if artist_relatedartist_rel not in rels:
+#             rels.append({"source": source, "target": target})
+#
+#         related_songs = db.run(
+#             'MATCH (s:Song) WHERE s.level = ' + str(level) + ' AND s.artist = "' + related_artist_properties[
+#                 "name"] + '" AND s.main = False RETURN s')
+#         source2 = target
+#         for related_song in related_songs:
+#             related_song_properties = related_song['s'].properties
+#             if level > 5:
+#                 related_song_graph = {"id": related_song_properties["id"], "title": related_song_properties["name"],
+#                                       "label": "song" + str(5), "uri": related_song_properties["uri"]}
+#                 if related_song_graph not in nodes:
+#                     nodes.append(related_song_graph)
+#             else:
+#                 related_song_graph = {"id": related_song_properties["id"], "title": related_song_properties["name"],
+#                                       "label": "song" + str(level), "uri": related_song_properties["uri"]}
+#                 for n in nodes:
+#                     if n["title"] == related_song_properties["name"]:
+#                         related_song_graph = n
+#                         break
+#                 if related_song_graph not in nodes:
+#                     nodes.append(related_song_graph)
+#             target = nodes.index(related_song_graph)
+#             relatedartist_relatedsong_rel = {"source": source2, "target": target}
+#             if relatedartist_relatedsong_rel not in rels:
+#                 rels.append({"source": source2, "target": target})
+#
+#     # Nuevas canciones de un artista ya disponible en la bbdd
+#     previous_related_artists = db.run('MATCH (a:Artist) WHERE a.level < ' + str(level) + ' RETURN a')
+#     for previous_related_artist in previous_related_artists:
+#         previous_related_artist_properties = previous_related_artist["a"].properties
+#         previous_related_artist_graph = {"id": previous_related_artist_properties["id"],
+#                                          "title": previous_related_artist_properties["name"],
+#                                          "label": "artist" + str(previous_related_artist_properties["level"]), "uri": previous_related_artist_properties["uri"]}
+#         for n in nodes:
+#             if n["title"] == previous_related_artist_properties["name"]:
+#                 previous_related_artist_graph = n
+#                 break
+#         source = nodes.index(previous_related_artist_graph)
+#         actual_related_songs = db.run(
+#             'MATCH (s:Song) WHERE s.level = ' + str(level) + ' AND s.artist = "' + previous_related_artist_properties[
+#                 "name"] + '" RETURN s')
+#         for actual_related_song in actual_related_songs:
+#             actual_related_song_properties = actual_related_song["s"].properties
+#             if level > 5:
+#                 previous_related_song_graph = {"id": actual_related_song_properties["id"],
+#                                                "title": actual_related_song_properties["name"],
+#                                                "label": "song" + str(5), "uri": actual_related_song_properties["uri"]}
+#                 if previous_related_song_graph not in nodes:
+#                     nodes.append(previous_related_song_graph)
+#             else:
+#                 previous_related_song_graph = {"id": actual_related_song_properties["id"],
+#                                                "title": actual_related_song_properties["name"],
+#                                                "label": "song" + str(level), "uri": actual_related_song_properties["uri"]}
+#                 for n in nodes:
+#                     if n["title"] == actual_related_song_properties["name"]:
+#                         previous_related_song_graph = n
+#                         break
+#                 if previous_related_song_graph not in nodes:
+#                     nodes.append(previous_related_song_graph)
+#             target = nodes.index(previous_related_song_graph)
+#             other_level_songs_rel = {"source": source, "target": target}
+#             if other_level_songs_rel not in rels:
+#                 rels.append({"source": source, "target": target})
+#
+#     if is_initial != "":
+#         initial_graph = False
+#
+#     return Response(dumps({"nodes": nodes, "links": rels}),
+#                     mimetype="application/json")
 
 
 if __name__ == '__main__':
