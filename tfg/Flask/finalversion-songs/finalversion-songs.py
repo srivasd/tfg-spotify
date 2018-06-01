@@ -275,6 +275,10 @@ def get_index():
 
                                             songs_checked.append(song)
 
+                                            print(song['name'])
+
+                                            print(change_feature)
+
                                             queryRelatedArtist = 'MATCH (a:Artist) WHERE a.name = "' + \
                                                                  related_artist['name'] + '" RETURN a'
                                             resultsRelatedArtist = db.run(queryRelatedArtist)
